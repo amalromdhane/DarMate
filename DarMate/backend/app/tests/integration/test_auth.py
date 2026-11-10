@@ -15,13 +15,13 @@ def test_weak_password_rejected(client):
 
 def test_duplicate_email(api, client):
     api.register("d@test.tn")
-    r = client.post("/api/v1/auth/register", json={"email": "d@test.tn", "password": "Passw0rdOK", "first_name": "a", "last_name": "b"})
+    r = client.post("/api/v1/auth/register", json={"email": "d@test.tn", "password": "Passw0rdOK", "first_name": "a", "last_name": "b", "role": "SEEKER"})
     assert r.status_code == 409
 
 
 def test_cannot_self_register_admin(client):
     r = client.post("/api/v1/auth/register", json={"email": "x@test.tn", "password": "Passw0rdOK", "first_name": "a",
-                                                    "last_name": "b", "roles": ["ADMIN"]})
+                                                    "last_name": "b", "role": ["ADMIN"]})
     assert r.status_code == 422
 
 

@@ -1,1 +1,8 @@
-form{margin-top:1rem}
+ .role-choice { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; border: 0; padding: 0; margin: 0 0 1rem; }
+.role-choice legend { font-weight: 600; margin-bottom: .5rem; padding: 0; }
+.role-card { position: relative; display: grid; gap: .2rem; padding: .9rem; border: 2px solid var(--line); border-radius: 10px; cursor: pointer; transition: border-color .2s, background .2s; }
+.role-card input { position: absolute; opacity: 0; pointer-events: none; }
+.role-card.sel { border-color: var(--pri); background: color-mix(in srgb, var(--pri) 7%, transparent); }
+.role-card:focus-within { outline: 3px solid color-mix(in srgb, var(--pri) 40%, transparent); }
+.role-card span { font-size: .88rem; color: var(--mut); }
+@media (max-width: 480px) { .role-choice { grid-template-columns: 1fr; } }

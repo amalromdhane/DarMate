@@ -1,4 +1,4 @@
-<h1>Créer un compte</h1>
+<!-- <h1>Créer un compte</h1>
 <p>Un même compte permet de chercher un logement et d’en proposer.</p>
 <form class="stack" [formGroup]="form" (ngSubmit)="submit()">
   <input formControlName="first_name" placeholder="Prénom"><input formControlName="last_name" placeholder="Nom">
@@ -9,4 +9,33 @@
 <div class="role-choice">
   <label><input type="radio" formControlName="role" value="SEEKER"> Je cherche un logement</label>
   <label><input type="radio" formControlName="role" value="OWNER"> Je suis propriétaire</label>
-</div>
+</div> -->
+
+<h1>Créer un compte</h1>
+<p>Choisissez votre profil. Ce choix est définitif pour ce compte.</p>
+
+<form class="stack" [formGroup]="form" (ngSubmit)="submit()">
+
+  <fieldset class="role-choice">
+    <legend>Je m'inscris en tant que</legend>
+
+    <label class="role-card" [class.sel]="form.value.role === 'SEEKER'">
+      <input type="radio" formControlName="role" value="SEEKER" />
+      <strong>Chercheur</strong>
+      <span>Je cherche un logement ou un colocataire.</span>
+    </label>
+
+    <label class="role-card" [class.sel]="form.value.role === 'OWNER'">
+      <input type="radio" formControlName="role" value="OWNER" />
+      <strong>Propriétaire</strong>
+      <span>Je propose mes logements à la location.</span>
+    </label>
+  </fieldset>
+
+  <input formControlName="first_name" placeholder="Prénom" autocomplete="given-name">
+  <input formControlName="last_name" placeholder="Nom" autocomplete="family-name">
+  <input formControlName="email" type="email" placeholder="E-mail" autocomplete="email">
+  <input formControlName="password" type="password" placeholder="Mot de passe (8 caractères min.)" autocomplete="new-password">
+
+  <button [disabled]="form.invalid || busy()">Créer mon compte</button>
+</form>

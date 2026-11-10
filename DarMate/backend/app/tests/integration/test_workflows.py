@@ -240,16 +240,34 @@ def test_identity_document_is_private(api, client):
     assert client.get(f"{API}/users/identity-documents/{did}").status_code == 401
 
 
-def test_profile_update_and_roles(api, client, city_id):
+def test_profile_update(api, client, city_id):
     uid, h = api.user("a@test.tn")
-    r = client.put(f"{API}/users/me", json={"bio": "Étudiant", "city_id": city_id, "roles": ["SEEKER", "OWNER"]}, headers=h)
-    assert r.status_code == 200 and sorted(r.json()["roles"]) == ["OWNER", "SEEKER"]
-    assert client.put(f"{API}/users/me", json={"roles": ["ADMIN"]}, headers=h).status_code == 422
+    r = client.put(f"{API}/users/me", json={"bio": "Étudiant", "city_id": city_id}, headers=h)
+    assert r.status_code == 200 and r.json()["roles"] == ["SEEKER"]
     assert client.put(f"{API}/users/me/password", json={"current_password": "wrong", "new_password": "NewPassw0rd1"}, headers=h).status_code == 422
     assert client.put(f"{API}/users/me/password", json={"current_password": "Passw0rdOK", "new_password": "NewPassw0rd1"}, headers=h).status_code == 200
     api.login("a@test.tn", "NewPassw0rd1")
 
-
+def test_features_are_separated_by_role(api, client, city_id, category_id):
+    sid, seeker = api.user("s@test.tn", ["SEEKER"])
+    oid, owner = api.user("o@test.tn", ["OWNER"])
+    # le rôle ne peut pas être changé via le profil
+    client.put(f"{API}/users/me", json={"roles": ["OWNER"]}, headers=seeker)
+    assert client.get(f"{API}/users/me", headers=seeker).json()["roles"] == ["SEEKER"]
+    # le chercheur ne publie pas
+    assert client.post(f"{API}/properties", json=prop_body(city_id, category_id), headers=seeker).status_code == 403
+    assert client.get(f"{API}/properties/mine", headers=seeker).status_code == 403
+    # le propriétaire n'a pas les fonctions chercheur
+    for url in ("/favorites", "/saved-searches", "/roommates", "/groups"):
+        assert client.get(API + url, headers=owner).status_code == 403
+    pid = make_property(client, owner, city_id, category_id)["id"]
+    assert client.post(f"{API}/rental-requests", json={"property_id": pid}, headers=owner).status_code == 403
+    assert client.post(f"{API}/visits", json={"property_id": pid, "slots": []}, headers=owner).status_code in (403, 422)
+    assert client.get(f"{API}/rental-requests", params={"box": "received"}, headers=seeker).status_code == 403
+    assert client.get(f"{API}/rental-requests", params={"box": "sent"}, headers=owner).status_code == 403
+    assert client.get(f"{API}/rental-requests", params={"box": "sent"}, headers=seeker).status_code == 200
+    assert client.get(f"{API}/rental-requests", params={"box": "received"}, headers=owner).status_code == 200
+    
 def test_public_profile_hides_private_data(api, client):
     uid, a = api.user("a@test.tn", first="Salma", last="Ben Ali")
     _, b = api.user("b@test.tn")

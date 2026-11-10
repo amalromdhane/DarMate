@@ -45,7 +45,7 @@ class Api:
 
     def register(self, email, roles=("SEEKER",), password="Passw0rdOK", first="Test", last="User"):
         r = self.c.post("/api/v1/auth/register", json={"email": email, "password": password, "first_name": first,
-                                                         "last_name": last, "roles": list(roles)})
+                                                         "last_name": last, "role": roles[0]})
         assert r.status_code == 201, r.text
         return r.json()
 

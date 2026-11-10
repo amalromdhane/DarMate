@@ -1,7 +1,37 @@
-<h1>Se connecter</h1>
+<!-- <h1>Se connecter</h1>
 <form class="stack" [formGroup]="form" (ngSubmit)="submit()">
   <input formControlName="email" type="email" placeholder="E-mail" autocomplete="email">
   <input formControlName="password" type="password" placeholder="Mot de passe" autocomplete="current-password">
   <button [disabled]="form.invalid || busy()">Se connecter</button>
   <a routerLink="/auth/register">Pas encore de compte ? Créer un compte</a>
-</form>
+</form> -->
+
+<div class="login-container">
+  <h1>Connexion</h1>
+  <p>Connectez-vous à votre compte DarMate.</p>
+
+  <form class="stack" [formGroup]="form" (ngSubmit)="submit()">
+    <input
+      formControlName="email"
+      type="email"
+      placeholder="E-mail"
+      autocomplete="email"
+    >
+
+    <input
+      formControlName="password"
+      type="password"
+      placeholder="Mot de passe"
+      autocomplete="current-password"
+    >
+
+    <button type="submit" [disabled]="form.invalid || busy()">
+      {{ busy() ? 'Connexion en cours...' : 'Se connecter' }}
+    </button>
+  </form>
+
+  <p class="switch">
+    Vous n'avez pas de compte ?
+    <a routerLink="/auth/register">Créer un compte</a>
+  </p>
+</div>

@@ -1,23 +1,28 @@
-# Frontend
-/frontend/node_modules/
-/frontend/.angular/
-/frontend/dist/
-/frontend/coverage/
-
-# Backend
-/backend/__pycache__/
-**/__pycache__/
+__pycache__/
 *.py[cod]
-/backend/.venv/
+*.egg-info/
 .venv/
 venv/
-
-# Environment
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+node_modules/
+frontend/dist/
+frontend/.angular/
 .env
 .env.*
-
-# IDE and system
+!.env.example
+backend/uploads/*
+!backend/uploads/.gitkeep
+*.sqlite3
+*.db
+mysql_data/
 .vscode/
 .idea/
+*.swp
 .DS_Store
 Thumbs.db
+*.log
+logs/
