@@ -1,0 +1,92 @@
+<!-- <h1>Trouvez votre logement</h1>
+<form class="row filters" [formGroup]="form" (ngSubmit)="apply()">
+  <input formControlName="q" placeholder="Rechercher">
+  <select formControlName="city_id"><option value="">Toutes les villes</option>@for (c of cities(); track c.id) { <option [value]="c.id">{{ c.name }}</option>}</select>
+  <select formControlName="category_id"><option value="">Tous les types</option>@for (c of categories(); track c.id) { <option [value]="c.id">{{ c.name }}</option>}</select>
+  <input formControlName="min_price" type="number" placeholder="Prix min"><input formControlName="max_price" type="number" placeholder="Prix max">
+  <input formControlName="min_rooms" type="number" min="1" placeholder="Pièces min">
+  <label><input type="checkbox" formControlName="coliving"> Colocation</label>
+  <select formControlName="sort"><option value="recent">Récents</option><option value="price_asc">Prix croissant</option><option value="price_desc">Prix décroissant</option></select>
+  <button>Rechercher</button>
+  @if (loggedIn()) { <button type="button" class="alt" (click)="saveSearch()">Enregistrer avec alerte</button> }
+</form>
+@if (result(); as r) {
+  <div class="grid">@for (p of r.items; track p.id) { <app-property-card [property]="p" (favToggle)="toggleFav($event)" /> } @empty { <p>Aucun logement ne correspond. Élargissez vos filtres.</p> }</div>
+  <app-pagination [page]="r.page" [total]="r.total" [size]="r.size" (pageChange)="go($event)" />
+} @else { <p>Chargement…</p> } -->
+
+
+<section class="hero" [formGroup]="form">
+  <h1>Trouvez le logement <span>qui vous ressemble</span></h1>
+  <p>Appartements, maisons, chambres et colocations partout en Tunisie.</p>
+  <div class="searchbar">
+    <label class="field grow"><app-icon name="search" [size]="18" /><input formControlName="q" placeholder="Titre, quartier, mot-clé…" aria-label="Rechercher"></label>
+    <label class="field"><app-icon name="pin" [size]="18" />
+      <select formControlName="city_id" aria-label="Ville"><option value="">Toutes les villes</option>@for (c of cities(); track c.id) { <option [value]="c.id">{{ c.name }}</option> }</select></label>
+    <label class="field price"><app-icon name="tag" [size]="18" /><input formControlName="min_price" type="number" min="0" placeholder="Min DT" aria-label="Prix minimum"><span>–</span><input formControlName="max_price" type="number" min="0" placeholder="Max DT" aria-label="Prix maximum"></label>
+    <button type="button" class="ghost" (click)="advanced.set(!advanced())" [attr.aria-expanded]="advanced()"><app-icon name="sliders" [size]="18" /> Filtres</button>
+  </div>
+  <div class="chips">
+    <button type="button" class="chip" [class.on]="!form.value.category_id" (click)="setCat('')"><app-icon name="home" [size]="16" /> Tous</button>
+    @for (c of categories(); track c.id) { <button type="button" class="chip" [class.on]="form.value.category_id === '' + c.id" (click)="setCat(c.id)"><app-icon [name]="catIcon(c.name)" [size]="16" /> {{ c.name }}</button> }
+  </div>
+</section>
+
+@if (advanced()) {
+  <section class="panel" [formGroup]="form">
+    <div><b>Pièces minimum</b><div class="chips in">@for (n of roomChoices; track n) { <button type="button" class="chip" [class.on]="form.value.min_rooms === '' + n" (click)="setRooms(n)"><app-icon name="bed" [size]="15" /> {{ n }}+</button> }</div></div>
+    <label class="switch"><input type="checkbox" formControlName="coliving"> <app-icon name="users" [size]="18" /> Colocation autorisée</label>
+  </section>
+}
+
+<div class="bar" [formGroup]="form">
+  <div class="tags">
+    <strong>{{ result()?.total ?? 0 }} logement(s)</strong>
+    @for (a of active(); track a.key) { <span class="tagx">{{ a.label }} <button type="button" (click)="clear(a.key)" [attr.aria-label]="'Retirer ' + a.label"><app-icon name="x" [size]="12" /></button></span> }
+    @if (active().length) { <button type="button" class="link" (click)="resetAll()"><app-icon name="reset" [size]="14" /> Tout effacer</button> }
+  </div>
+  <div class="row">
+    <select formControlName="sort" aria-label="Trier"><option value="recent">Plus récents</option><option value="price_asc">Prix croissant</option><option value="price_desc">Prix décroissant</option></select>
+    @if (loggedIn()) { <button type="button" class="alt" (click)="saveSearch()"><app-icon name="star" [size]="16" /> Créer une alerte</button> }
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="grid">
+    @for (s of skeletons; track s) {
+      <div class="sk"></div>
+    }
+  </div>
+} @else {
+  @if (result(); as data) {
+
+    <div class="grid">
+      @for (p of data.items; track p.id) {
+        <app-property-card
+          [property]="p"
+          (favToggle)="toggleFav($event)"
+        />
+      }
+    </div>
+
+    @if (!data.items.length) {
+      <div class="empty">
+        <app-icon name="search" [size]="40" />
+        <h2>Aucun logement trouvé</h2>
+        <p>Essayez d’élargir vos critères.</p>
+        <button type="button" (click)="resetAll()">
+          Réinitialiser les filtres
+        </button>
+      </div>
+    }
+
+    <app-pagination
+      [page]="data.page"
+      [total]="data.total"
+      [size]="data.size"
+      (pageChange)="go($event)"
+    />
+
+  }
+}
+

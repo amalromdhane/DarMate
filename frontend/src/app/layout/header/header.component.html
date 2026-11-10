@@ -1,0 +1,114 @@
+<header class="site-header">
+  <div class="header-inner">
+
+
+    <a class="brand" routerLink="/" (click)="closeMobile()">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2z" />
+      </svg>
+      <span>Dar<strong>Mate</strong></span>
+    </a>
+
+
+    <button class="menu-toggle" (click)="toggleMobile()" aria-label="Menu">
+      @if (!mobileOpen()) {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+      } @else {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+      }
+    </button>
+
+
+    <nav class="nav" [class.open]="mobileOpen()">
+      <a routerLink="/properties" routerLinkActive="on" (click)="closeMobile()">Logements</a>
+
+      @if (auth.isLoggedIn()) {ˇ
+      <a routerLink="/properties/new" routerLinkActive="on" (click)="closeMobile()">
+        Publier
+      </a>
+      
+
+     
+      <a routerLink="/properties/mine" routerLinkActive="on" (click)="closeMobile()">
+        Mes annonces
+      </a>
+      
+      <a routerLink="/favorites" routerLinkActive="on" (click)="closeMobile()">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z" />
+        </svg>
+        Favoris
+      </a>
+      
+
+      <a routerLink="/rental-requests" routerLinkActive="on" (click)="closeMobile()">Demandes</a>
+
+      <a routerLink="/messages" routerLinkActive="on" (click)="closeMobile()">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+        </svg>
+        Messages
+      </a>
+
+
+      <a routerLink="/notifications" routerLinkActive="on" class="notif-link" (click)="closeMobile()">
+        <span class="notif-wrap">
+          <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+          </svg>
+          @if (hasUnread()) {
+          <span class="badge" [attr.aria-label]="unreadCount() + ' non lues'">
+            {{ unreadCount() > 99 ? '99+' : unreadCount() }}
+          </span>
+          }
+        </span>
+        Notifications
+      </a>
+
+      @if (auth.isAdmin()) {
+      <a routerLink="/admin" routerLinkActive="on" (click)="closeMobile()">Admin</a>
+      }
+
+      <div class="user-menu">
+        <button class="user-btn" type="button" (click)="toggleUserMenu()" aria-haspopup="menu"
+          [attr.aria-expanded]="userMenuOpen()" aria-label="Mon compte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21a8 8 0 0 1 16 0" />
+          </svg>
+        </button>
+
+        @if (userMenuOpen()) {
+        <div class="dropdown" role="menu">
+          <a routerLink="/profile" role="menuitem" (click)="closeAll()">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 21a8 8 0 0 1 16 0" />
+            </svg>
+            Mon profil
+          </a>
+
+          <div class="dropdown-sep"></div>
+
+          <button type="button" class="danger" role="menuitem" (click)="logout()">
+            <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <path d="M16 17l5-5-5-5M21 12H9" />
+            </svg>
+            Se déconnecter
+          </button>
+        </div>
+        }
+      </div>
+      } @else {
+      <a routerLink="/auth/login" routerLinkActive="on" (click)="closeMobile()">Se connecter</a>
+      <a routerLink="/auth/register" class="cta" (click)="closeMobile()">Créer un compte</a>
+      }
+    </nav>
+  </div>
+</header>

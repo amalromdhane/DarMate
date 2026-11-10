@@ -1,0 +1,2 @@
+<h1>Mes favoris</h1>
+<div class="grid">@for (p of items(); track p.id) { <app-property-card [property]="p" (favToggle)="remove($event)" /> } @empty { <p>Aucun favori. Parcourez les logements pour en ajouter.</p> }</div>

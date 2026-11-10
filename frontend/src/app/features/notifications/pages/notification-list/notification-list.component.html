@@ -1,0 +1,2 @@
+<div class="row"><h1>Notifications ({{ unread() }} non lues)</h1><button class="alt" (click)="readAll()">Tout marquer comme lu</button></div>
+@for (n of items(); track n.id) { <div class="card item" [class.read]="n.is_read" (click)="read(n)"><b>{{ n.title }}</b><p>{{ n.body }}</p></div> } @empty { <p>Rien de nouveau.</p> }

@@ -1,0 +1,71 @@
+<!-- <div class="chat">
+  <aside>@for (c of conversations(); track c.id) { <button [class.alt]="c.id !== current()" (click)="open(c.id)">{{ c.title || 'Conversation ' + c.id }}@if (c.unread_count) { ({{ c.unread_count }}) }</button> } @empty { <p>Aucune conversation.</p> }</aside>
+  <section>
+    @if (current()) {
+      <div class="thread">@for (m of messages(); track m.id) { <div class="bubble" [class.me]="m.sender_id === me()?.id">{{ m.body }}@if (m.attachment) { <a [href]="url(m.attachment.id)"> 📎 {{ m.attachment.original_name }}</a> }</div> }</div>
+      <form class="row" [formGroup]="form" (ngSubmit)="send()"><input formControlName="body" placeholder="Votre message"><input type="file" (change)="attach($event)"><button [disabled]="form.invalid">Envoyer</button></form>
+    } @else { <p>Choisissez une conversation.</p> }
+  </section>
+</div> -->
+
+<div class="chat">
+
+  <!-- ============ ASIDE : LISTE CONVERSATIONS ============ -->
+  <aside>
+    @for (c of conversations(); track c.id) {
+      <button
+        [class.alt]="c.id !== current()"
+        (click)="open(c.id)">
+        <span class="dot"></span>
+        <span class="title">
+          {{ c.title || 'Conversation ' + c.id }}
+          @if (c.unread_count) {
+            <em class="badge">{{ c.unread_count }}</em>
+          }
+        </span>
+      </button>
+    } @empty {
+      <p>✨ Aucune conversation pour l’instant.</p>
+    }
+  </aside>
+
+  <!-- ============ SECTION : THREAD + FORM ============ -->
+  <section>
+    @if (current()) {
+
+      <div class="thread">
+        @for (m of messages(); track m.id) {
+          <div class="bubble" [class.me]="m.sender_id === me()?.id">
+            {{ m.body }}
+            @if (m.attachment) {
+              <a [href]="url(m.attachment.id)" target="_blank" rel="noopener">
+                📎 {{ m.attachment.original_name }}
+              </a>
+            }
+          </div>
+        } @empty {
+          <p style="text-align:center;color:var(--text-soft);margin:auto;font-style:italic;">
+            💌 Commencez la conversation…
+          </p>
+        }
+      </div>
+
+      <form class="row" [formGroup]="form" (ngSubmit)="send()">
+        <input
+          formControlName="body"
+          placeholder="Écrivez votre message…"
+          autocomplete="off" />
+
+        <input
+          type="file"
+          title="Joindre un fichier"
+          (change)="attach($event)" />
+
+        <button [disabled]="form.invalid">Envoyer</button>
+      </form>
+
+    } @else {
+      <p>👈 Choisissez une conversation à gauche pour commencer.</p>
+    }
+  </section>
+</div>

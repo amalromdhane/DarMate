@@ -1,0 +1,2 @@
+<div class="row"><button class="alt" [disabled]="page() <= 1" (click)="pageChange.emit(page() - 1)">Précédent</button>
+<span>Page {{ page() }} / {{ pages() }}</span><button class="alt" [disabled]="page() >= pages()" (click)="pageChange.emit(page() + 1)">Suivant</button></div>

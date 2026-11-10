@@ -1,0 +1,43 @@
+<!-- <article class="card">
+  <div class="pic">
+    <a [routerLink]="['/properties', property().id]">
+      @if (current(); as s) { <img [src]="s" alt=""> } @else { <div class="ph"></div> }
+    </a>
+    @if (urls().length > 1) {
+      <button type="button" class="nav prev" aria-label="Photo précédente" (click)="move(-1)">‹</button>
+      <button type="button" class="nav next" aria-label="Photo suivante" (click)="move(1)">›</button>
+      <span class="count">{{ index() + 1 }}/{{ urls().length }}</span>
+    }
+  </div>
+  <a [routerLink]="['/properties', property().id]"><h3>{{ property().title }}</h3></a>
+  <p>{{ property().price }} DT / mois @if (property().city_name) { · {{ property().city_name }} } @if (property().coliving) { <span class="tag">Colocation</span> }</p>
+  @if (showFav()) { <button class="alt" (click)="favToggle.emit(property())">{{ property().is_favorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}</button> }
+</article> -->
+<article class="tile">
+  <div class="pic">
+    <a [routerLink]="['/properties', property().id]" aria-label="Voir l’annonce">
+      @if (current(); as s) { <img [src]="s" alt=""> } @else { <div class="ph"><app-icon name="home" [size]="42" /></div> }
+    </a>
+    <span class="price">{{ property().price }} DT<small> / mois</small></span>
+    @if (property().coliving) { <span class="badge"><app-icon name="users" [size]="14" /> Colocation</span> }
+    @if (showFav()) {
+      <button type="button" class="fav" [class.on]="property().is_favorite" [attr.aria-label]="property().is_favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'" (click)="favToggle.emit(property())"><app-icon name="heart" [size]="18" [filled]="!!property().is_favorite" /></button>
+    }
+    @if (urls().length > 1) {
+      <button type="button" class="nav prev" aria-label="Photo précédente" (click)="move(-1, $event)"><app-icon name="left" [size]="16" /></button>
+      <button type="button" class="nav next" aria-label="Photo suivante" (click)="move(1, $event)"><app-icon name="right" [size]="16" /></button>
+      <span class="count">{{ index() + 1 }}/{{ urls().length }}</span>
+    }
+  </div>
+  <div class="body">
+    <a [routerLink]="['/properties', property().id]"><h3>{{ property().title }}</h3></a>
+    @if (property().city_name) { <p class="loc"><app-icon name="pin" [size]="15" /> {{ property().city_name }}</p> }
+    @if (property().rooms || property().surface_m2 || property().category_name) {
+      <ul class="facts">
+        @if (property().category_name) { <li><app-icon name="building" [size]="15" /> {{ property().category_name }}</li> }
+        @if (property().rooms) { <li><app-icon name="bed" [size]="15" /> {{ property().rooms }} p.</li> }
+        @if (property().surface_m2) { <li><app-icon name="area" [size]="15" /> {{ property().surface_m2 }} m²</li> }
+      </ul>
+    }
+  </div>
+</article>

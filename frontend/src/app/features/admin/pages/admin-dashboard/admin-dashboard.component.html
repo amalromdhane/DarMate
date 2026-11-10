@@ -1,0 +1,103 @@
+<!-- <h1>Administration</h1>
+<div class="grid">@for (s of stats(); track s[0]) { <div class="card"><b>{{ s[1] }}</b><br>{{ s[0] }}</div> }</div>
+<h2>Utilisateurs</h2><div class="row"><input [(ngModel)]="q" placeholder="Rechercher" (keyup.enter)="load()"><button (click)="load()">Rechercher</button></div>
+@for (u of users()?.items ?? []; track u.id) { <div class="card item">{{ u.email }} <span class="tag">{{ u.status | statusLabel }}</span>
+  <button class="alt" (click)="setStatus(u, 'ACTIVE')">Valider</button><button class="alt" (click)="setStatus(u, 'SUSPENDED')">Suspendre</button><button class="alt" (click)="setStatus(u, 'BANNED')">Bannir</button></div> } -->
+
+ <div class="dashboard">
+  <!-- Header -->
+  <header class="page-header">
+    <div>
+      <h1>Administration</h1>
+      <p class="subtitle">Gérez les utilisateurs et gardez un œil sur l'activité.</p>
+    </div>
+    <button class="btn-refresh" (click)="load()" [disabled]="loading()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+        <polyline points="21 3 21 9 15 9"/>
+      </svg>
+      {{ loading() ? 'Chargement…' : 'Actualiser' }}
+    </button>
+  </header>
+
+  <!-- Stats -->
+  <section class="stats-grid">
+    @for (s of stats(); track s[0]; let i = $index) {
+      <div class="stat-card" [attr.data-accent]="i % 4">
+        <div class="stat-value">{{ s[1] }}</div>
+        <div class="stat-label">{{ s[0] }}</div>
+      </div>
+    }
+  </section>
+
+  <!-- Users -->
+  <section class="users-section">
+    <div class="section-head">
+      <h2>Utilisateurs</h2>
+      <div class="search-bar">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          [(ngModel)]="q"
+          placeholder="Rechercher un utilisateur…"
+          (keyup.enter)="load()"
+        />
+        <button class="btn-search" (click)="load()" [disabled]="loading()">
+          Rechercher
+        </button>
+      </div>
+    </div>
+
+    <nav class="tabs">
+      <button [class.active]="activeTab() === 'all'" (click)="activeTab.set('all')">Tous</button>
+      <button [class.active]="activeTab() === 'ACTIVE'" (click)="activeTab.set('ACTIVE')">Actifs</button>
+      <button [class.active]="activeTab() === 'SUSPENDED'" (click)="activeTab.set('SUSPENDED')">Suspendus</button>
+      <button [class.active]="activeTab() === 'BANNED'" (click)="activeTab.set('BANNED')">Bannis</button>
+    </nav>
+
+    <div class="user-list">
+      @for (u of filteredUsers(); track u.id) {
+        <div class="user-card" [attr.data-status]="u.status">
+          <div class="user-info">
+            <div class="avatar" [attr.data-status]="u.status">
+              {{ u.email.charAt(0).toUpperCase() }}
+            </div>
+            <div class="user-meta">
+              <span class="user-email">{{ u.email }}</span>
+              <span class="tag" [attr.data-status]="u.status">
+                {{ u.status | statusLabel }}
+              </span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="action success" (click)="setStatus(u, 'ACTIVE')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Valider
+            </button>
+            <button class="action warn" (click)="setStatus(u, 'SUSPENDED')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></svg>
+              Suspendre
+            </button>
+            <button class="action danger" (click)="setStatus(u, 'BANNED')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>
+              Bloquer
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-6l-2 3h-4l-2-3H2"/>
+              <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </div>
+          <p>Aucun utilisateur trouvé.</p>
+        </div>
+      }
+    </div>
+  </section>
+</div>

@@ -1,0 +1,452 @@
+/* .chat{display:grid;grid-template-columns:240px 1fr;gap:1rem}@media(max-width:700px){.chat{grid-template-columns:1fr}}
+aside button{display:block;width:100%;margin:3px 0}.thread{min-height:300px;max-height:60vh;overflow:auto}
+.bubble{background:var(--line);padding:.4rem .7rem;border-radius:10px;max-width:75%;margin:.2rem 0}.bubble.me{background:var(--pri);color:#fff;margin-left:auto}form input:first-child{flex:1} */
+
+
+/* ============================================================
+   CHAT – Design moderne, élégant, coloré & interactif
+   ============================================================ */
+/* ============================================================
+   CHAT – Design moderne, élégant, bleu calme & lumineux
+   ============================================================ */
+
+:host {
+  /* --- Palette bleu calme --- */
+  --bg-glass: rgba(255, 255, 255, 0.72);
+  --bg-glass-dark: rgba(240, 248, 255, 0.55);
+
+  --pri: #3b82f6;          /* bleu doux */
+  --pri-2: #60a5fa;        /* bleu clair */
+  --pri-3: #38bdf8;        /* sky */
+  --pri-4: #7dd3fc;        /* cyan pastel */
+
+  --pri-gradient: linear-gradient(135deg, #3b82f6 0%, #60a5fa 45%, #38bdf8 100%);
+  --pri-gradient-soft: linear-gradient(135deg, rgba(59,130,246,.12), rgba(125,211,252,.14));
+
+  --line: #e5effa;
+  --text: #1e3a5f;         /* bleu nuit doux */
+  --text-soft: #64748b;
+
+  --radius: 18px;
+  --radius-sm: 12px;
+
+  --shadow-lg: 0 20px 50px -12px rgba(59, 130, 246, 0.22);
+  --shadow-sm: 0 4px 14px rgba(59, 130, 246, 0.08);
+
+  --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Conteneur principal */
+.chat {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.25rem;
+  height: calc(100vh - 4rem);
+  max-height: 860px;
+  padding: 1rem;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(125,211,252,.10), transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(59,130,246,.08), transparent 45%);
+}
+
+/* ===================== ASIDE ===================== */
+aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--bg-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  overflow-y: auto;
+  position: relative;
+}
+
+aside::before {
+  content: '💬 Conversations';
+  display: block;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 0.25rem 0.5rem 0.75rem;
+  background: var(--pri-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.02em;
+}
+
+aside button {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+aside button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--pri-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+aside button:hover {
+  transform: translateX(3px);
+  border-color: rgba(96, 165, 250, 0.45);
+  background: var(--pri-gradient-soft);
+}
+
+aside button:hover::before { opacity: 0.06; }
+
+/* Conversation active */
+aside button:not(.alt) {
+  background: var(--pri-gradient);
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.5);
+  font-weight: 600;
+}
+
+aside button:not(.alt):hover {
+  transform: translateX(3px) scale(1.01);
+  box-shadow: 0 10px 26px -6px rgba(59, 130, 246, 0.65);
+}
+
+aside button:not(.alt) em,
+aside button:not(.alt) .badge {
+  background: #fff;
+  color: var(--pri);
+}
+
+/* Empty state */
+aside p {
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  padding: 2rem 1rem;
+  font-style: italic;
+}
+
+/* ===================== SECTION ===================== */
+section {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  position: relative;
+}
+
+section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--pri-gradient);
+  opacity: 0.9;
+}
+
+section > p {
+  margin: auto;
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 1rem;
+  padding: 2rem;
+}
+
+/* ===================== HEADER THREAD ===================== */
+.thread-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid rgba(229, 239, 250, 0.8);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.thread-header .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #fff;
+  background: var(--pri-gradient);
+  box-shadow: 0 6px 16px -4px rgba(59, 130, 246, 0.5);
+}
+
+.thread-header strong { display: block; font-size: 0.95rem; }
+.thread-header small { color: #10b981; font-size: 0.75rem; font-weight: 600; }
+
+/* ===================== THREAD ===================== */
+.thread {
+  flex: 1;
+  min-height: 300px;
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  scroll-behavior: smooth;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(96,165,250,.07), transparent 40%),
+    radial-gradient(circle at 90% 100%, rgba(125,211,252,.08), transparent 40%);
+}
+
+.thread::-webkit-scrollbar { width: 8px; }
+.thread::-webkit-scrollbar-track { background: transparent; }
+.thread::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.35);
+  border-radius: 8px;
+}
+.thread::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, 0.6);
+}
+
+/* ===================== BULLES ===================== */
+.bubble {
+  position: relative;
+  max-width: 72%;
+  padding: 0.65rem 1rem;
+  border-radius: 18px 18px 18px 6px;
+  background: #ffffff;
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.08);
+  border: 1px solid var(--line);
+  animation: bubble-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+@keyframes bubble-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Bulle "moi" */
+.bubble.me {
+  align-self: flex-end;
+  background: var(--pri-gradient);
+  color: #fff;
+  border: none;
+  border-radius: 18px 18px 6px 18px;
+  box-shadow: 0 10px 24px -8px rgba(59, 130, 246, 0.5);
+  margin-left: auto;
+}
+
+.bubble.me a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Pièce jointe */
+.bubble a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 10px;
+  background: rgba(96, 165, 250, 0.14);
+  color: var(--pri);
+  font-size: 0.82rem;
+  text-decoration: none;
+  transition: var(--transition);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+.bubble a:hover {
+  background: rgba(96, 165, 250, 0.25);
+  transform: translateY(-1px);
+}
+
+.bubble.me a {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.bubble.me a:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+/* ===================== FORMULAIRE ===================== */
+form.row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border-top: 1px solid rgba(229, 239, 250, 0.8);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+form.row input[formControlName="body"] {
+  flex: 1;
+  padding: 0.75rem 1.1rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.92rem;
+  color: var(--text);
+  outline: none;
+  transition: var(--transition);
+}
+
+form.row input[formControlName="body"]:focus {
+  border-color: var(--pri-2);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.18);
+}
+
+form.row input[formControlName="body"]::placeholder {
+  color: #94a3b8;
+}
+
+/* Input file stylisé */
+form.row input[type="file"] {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(96, 165, 250, 0.6);
+  background: rgba(96, 165, 250, 0.10);
+  cursor: pointer;
+  color: transparent;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+form.row input[type="file"]:hover {
+  background: rgba(96, 165, 250, 0.20);
+  border-color: var(--pri-2);
+  transform: rotate(8deg) scale(1.05);
+}
+
+form.row input[type="file"]::file-selector-button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  position: absolute;
+  inset: 0;
+  color: transparent;
+}
+
+form.row input[type="file"]::after {
+  content: '📎';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  pointer-events: none;
+}
+
+/* Bouton envoyer */
+form.row button {
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--pri-gradient);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 8px 18px -6px rgba(59, 130, 246, 0.55);
+  position: relative;
+  overflow: hidden;
+}
+
+form.row button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #38bdf8, #60a5fa);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+form.row button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -6px rgba(59, 130, 246, 0.7);
+}
+
+form.row button:hover:not(:disabled)::before { opacity: 1; }
+
+form.row button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+form.row button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 900px) {
+  .chat {
+    grid-template-columns: 220px 1fr;
+    gap: 0.75rem;
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .chat {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  aside {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.6rem;
+    gap: 0.4rem;
+  }
+
+  aside::before { display: none; }
+
+  aside button {
+    width: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .thread { max-height: 55vh; }
+  .bubble { max-width: 85%; }
+
+  form.row { padding: 0.65rem; }
+  form.row button { padding: 0.65rem 1rem; }
+}

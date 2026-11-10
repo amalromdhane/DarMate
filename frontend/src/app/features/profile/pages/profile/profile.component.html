@@ -1,0 +1,33 @@
+<section class="profile">
+  <h1>Mon profil</h1>
+
+  @if (message(); as m) {
+    <div class="alert" [class.err]="m.type === 'err'">{{ m.text }}</div>
+  }
+
+  <form class="card" [formGroup]="infoForm" (ngSubmit)="saveInfo()">
+    <h2>Informations personnelles</h2>
+    <div class="grid">
+      <label>Prénom <input formControlName="firstName" /></label>
+      <label>Nom <input formControlName="lastName" /></label>
+      <label>Email <input type="email" formControlName="email" /></label>
+      <label>Téléphone <input formControlName="phone" /></label>
+    </div>
+    <button class="btn" [disabled]="saving()">Enregistrer</button>
+  </form>
+
+  <form class="card" [formGroup]="pwdForm" (ngSubmit)="savePassword()">
+    <h2>Changer le mot de passe</h2>
+    <div class="grid">
+      <label>Mot de passe actuel <input type="password" formControlName="currentPassword" /></label>
+      <label>Nouveau mot de passe <input type="password" formControlName="newPassword" /></label>
+    </div>
+    <button class="btn">Modifier</button>
+  </form>
+
+  <div class="card danger-zone">
+    <h2>Zone dangereuse</h2>
+    <p>La suppression du compte est définitive.</p>
+    <button class="btn danger" type="button" (click)="deleteAccount()">Supprimer mon compte</button>
+  </div>
+</section>

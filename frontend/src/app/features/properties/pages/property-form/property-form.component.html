@@ -1,0 +1,153 @@
+<!-- <h1>{{ id() ? 'Modifier l’annonce' : 'Publier une annonce' }}</h1>
+<form class="stack" [formGroup]="form" (ngSubmit)="submit()">
+  <input formControlName="title" placeholder="Titre"><textarea formControlName="description" placeholder="Description"></textarea>
+  <input formControlName="price" type="number" placeholder="Loyer mensuel"><input formControlName="rooms" type="number" placeholder="Pièces"><input formControlName="address" placeholder="Adresse">
+  <select formControlName="city_id"><option [ngValue]="0">Ville</option>@for (c of cities(); track c.id) { <option [ngValue]="c.id">{{ c.name }}</option>}</select>
+  <select formControlName="category_id"><option [ngValue]="0">Type de logement</option>@for (c of categories(); track c.id) { <option [ngValue]="c.id">{{ c.name }}</option>}</select>
+  <textarea formControlName="conditions" placeholder="Conditions de location"></textarea>
+  <input formControlName="surface_m2" type="number" placeholder="Surface (m²)">
+<label>Disponible à partir du <input type="date" formControlName="available_from"></label>
+  <label><input type="checkbox" formControlName="coliving_allowed"> Colocation autorisée</label>
+@if (form.value.coliving_allowed) { <input formControlName="max_roommates" type="number" min="2" placeholder="Colocataires max"> }
+  <input type="file" accept="image/*" multiple (change)="pick($event)">
+  <button type="submit">Enregistrer</button>
+</form> -->
+
+<div class="form-container">
+  <h1>{{ id() ? 'Modifier l’annonce' : 'Publier une annonce' }}</h1>
+  <p class="subtitle">Remplissez les informations ci-dessous pour {{ id() ? 'mettre à jour' : 'créer' }} votre annonce.</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    
+    <!-- SECTION 1 : Informations générales -->
+    <fieldset class="form-section">
+      <legend>Informations générales</legend>
+      
+      <div class="form-group">
+        <label for="title">Titre de l'annonce *</label>
+        <input id="title" formControlName="title" placeholder="Ex: Bel appartement lumineux au centre-ville">
+        @if (form.controls.title.touched && form.controls.title.invalid) {
+          <span class="error-msg">Le titre est obligatoire.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea id="description" formControlName="description" rows="4" placeholder="Décrivez votre logement, ses atouts, le quartier..."></textarea>
+        @if (form.controls.description.touched && form.controls.description.invalid) {
+          <span class="error-msg">La description est obligatoire.</span>
+        }
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="price">Loyer mensuel (€) *</label>
+          <input id="price" formControlName="price" type="number" placeholder="Ex: 750">
+          @if (form.controls.price.touched && form.controls.price.invalid) {
+            <span class="error-msg">Le prix doit être supérieur à 0.</span>
+          }
+        </div>
+        <div class="form-group">
+          <label for="category_id">Type de logement *</label>
+          <select id="category_id" formControlName="category_id">
+            <option [ngValue]="0" disabled>Sélectionnez un type</option>
+            @for (c of categories(); track c.id) { 
+              <option [ngValue]="c.id">{{ c.name }}</option>
+            }
+          </select>
+          @if (form.controls.category_id.touched && form.controls.category_id.invalid) {
+            <span class="error-msg">Choisissez un type.</span>
+          }
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- SECTION 2 : Localisation -->
+    <fieldset class="form-section">
+      <legend>Localisation</legend>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="city_id">Ville *</label>
+          <select id="city_id" formControlName="city_id">
+            <option [ngValue]="0" disabled>Sélectionnez une ville</option>
+            @for (c of cities(); track c.id) { 
+              <option [ngValue]="c.id">{{ c.name }}</option>
+            }
+          </select>
+          @if (form.controls.city_id.touched && form.controls.city_id.invalid) {
+            <span class="error-msg">Choisissez une ville.</span>
+          }
+        </div>
+        <div class="form-group">
+          <label for="address">Adresse exacte</label>
+          <input id="address" formControlName="address" placeholder="Ex: 12 rue de la Paix">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- SECTION 3 : Détails et Options -->
+    <fieldset class="form-section">
+      <legend>Détails et Options</legend>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label for="rooms">Pièces</label>
+          <input id="rooms" formControlName="rooms" type="number" min="1">
+        </div>
+        <div class="form-group">
+          <label for="surface_m2">Surface (m²)</label>
+          <input id="surface_m2" formControlName="surface_m2" type="number" placeholder="Ex: 45">
+        </div>
+        <div class="form-group">
+          <label for="available_from">Disponible à partir du</label>
+          <input id="available_from" type="date" formControlName="available_from">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="conditions">Conditions de location</label>
+        <textarea id="conditions" formControlName="conditions" rows="2" placeholder="Ex: Garant, CDI, 3 fois le loyer..."></textarea>
+      </div>
+
+      <div class="toggle-group">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="coliving_allowed">
+          <span class="checkmark"></span>
+          Colocation autorisée
+        </label>
+        
+        @if (form.value.coliving_allowed) {
+          <div class="form-group inline-group animate-in">
+            <label for="max_roommates">Colocataires max</label>
+            <input id="max_roommates" formControlName="max_roommates" type="number" min="2">
+          </div>
+        }
+      </div>
+    </fieldset>
+
+    <!-- SECTION 4 : Photos -->
+    <fieldset class="form-section">
+      <legend>Photos</legend>
+      <div class="file-upload">
+        <label for="file-input" class="file-label">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Ajouter des photos</span>
+        </label>
+        <input id="file-input" type="file" accept="image/*" multiple (change)="pick($event)">
+        @if (files().length > 0) {
+          <p class="file-count">{{ files().length }} fichier(s) sélectionné(s)</p>
+        }
+      </div>
+    </fieldset>
+
+    <!-- ACTIONS -->
+    <div class="form-actions">
+      <button type="submit" class="btn-submit">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        {{ id() ? 'Mettre à jour l\'annonce' : 'Publier l\'annonce' }}
+      </button>
+    </div>
+
+  </form>
+</div>

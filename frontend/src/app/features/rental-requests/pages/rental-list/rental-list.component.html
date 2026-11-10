@@ -1,0 +1,11 @@
+<h1>Demandes de location</h1>
+<div class="row"><button [class.alt]="box() !== 'sent'" (click)="setBox('sent')">Envoyées</button><button [class.alt]="box() !== 'received'" (click)="setBox('received')">Reçues</button></div>
+@for (r of items(); track r.id) {
+  <div class="card item"><b><a [routerLink]="['/properties', r.property?.id]">{{ r.property?.title ?? 'Demande n°' + r.id }}</a></b> <span class="tag">{{ r.status | statusLabel }}</span>
+    <p>{{ r.message }}</p>
+    <div class="row">
+      @if (box() === 'received' && r.status === 'PENDING') { <button (click)="setStatus(r, 'ACCEPTED')">Accepter</button><button class="alt" (click)="setStatus(r, 'REJECTED')">Refuser</button> }
+      @if (box() === 'sent' && r.status === 'ACCEPTED') { <button (click)="confirm(r)">Confirmer la location</button> }
+      @if (box() === 'sent' && r.status === 'PENDING') { <button class="alt" (click)="setStatus(r, 'CANCELLED')">Annuler</button> }
+    </div></div>
+} @empty { <p>Aucune demande pour le moment.</p> }

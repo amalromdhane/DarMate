@@ -1,0 +1,71 @@
+<!-- <div class="row"><h1>Mes annonces</h1><a routerLink="/properties/new">Nouvelle annonce</a></div>
+<div class="grid">@for (p of data()?.items ?? []; track p.id) {
+  <div><app-property-card [property]="p" [showFav]="false" />
+  <div class="row"><span class="tag">{{ p.status === 'AVAILABLE' ? 'Suspendre' : 'Mettre en ligne' }}</span><a [routerLink]="['/properties', p.id, 'edit']">Modifier</a>
+  <button class="alt" (click)="toggle(p)">{{ p.status === 'PUBLISHED' ? 'Suspendre' : 'Publier' }}</button><button class="alt" (click)="remove(p)">Supprimer</button></div></div>
+} @empty { <p>Vous n’avez pas encore d’annonce.</p> }</div> -->
+<div class="page-header">
+  <div>
+    <h1>Mes annonces</h1>
+    <p class="subtitle">Gérez vos biens, modifiez les détails ou changez leur visibilité.</p>
+  </div>
+  <a routerLink="/properties/new" class="btn-primary">
+    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+    Nouvelle annonce
+  </a>
+</div>
+
+<div class="grid">
+  @for (p of data()?.items ?? []; track p.id) {
+    <div class="property-item">
+      <!-- La carte existante -->
+      <app-property-card [property]="p" [showFav]="false" />
+      
+      <!-- Barre d'actions -->
+      <div class="item-actions">
+      
+        <div class="action-buttons">
+          <a [routerLink]="['/properties', p.id, 'edit']" class="btn-icon" title="Modifier">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </a>
+          
+          <button class="btn-icon warning" (click)="toggle(p)" [title]="p.status === 'AVAILABLE' ? 'Suspendre' : 'Publier'">
+            @if (p.status === 'PUBLISHED') {
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="10 8 16 12 10 16 10 8"></polygon>
+              </svg>
+            }
+          </button>
+          
+          <button class="btn-icon danger" (click)="remove(p)" title="Supprimer">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  } @empty {
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none">
+        <path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2z"/>
+      </svg>
+      <h3>Vous n’avez pas encore d’annonce</h3>
+      <p>Publiez votre premier bien pour commencer à recevoir des demandes.</p>
+      <a routerLink="/properties/new" class="btn-primary">Créer une annonce</a>
+    </div>
+  }
+</div>

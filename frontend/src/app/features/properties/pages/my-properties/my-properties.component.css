@@ -1,0 +1,166 @@
+/* .row h1{margin-right:auto} */
+
+
+/* ============ EN-TÊTE DE PAGE ============ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  margin: 0 0 0.25rem 0;
+  color: var(--ink);
+}
+
+.subtitle {
+  color: var(--mut);
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background: var(--pri);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--pri) 30%, transparent);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: color-mix(in srgb, var(--pri) 85%, black);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--pri) 40%, transparent);
+}
+
+/* ============ GRILLE ET CARTES ============ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.property-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.property-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* On retire la bordure de la carte interne pour qu'elle fusionne avec le conteneur */
+.property-item app-property-card {
+  flex: 1;
+}
+
+/* ============ BARRE D'ACTIONS ============ */
+.item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--bg) 50%, var(--card));
+  border-top: 1px solid var(--line);
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #2e7d32; /* Vert */
+  background: color-mix(in srgb, #2e7d32 15%, transparent);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+}
+
+.status-badge.suspended {
+  color: var(--err);
+  background: color-mix(in srgb, var(--err) 15%, transparent);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* ============ BOUTONS D'ACTION (ICÔNES) ============ */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--mut);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background: var(--bg);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 30%, var(--line));
+}
+
+.btn-icon.warning:hover {
+  color: var(--acc);
+  border-color: var(--acc);
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+}
+
+.btn-icon.danger:hover {
+  color: var(--err);
+  border-color: var(--err);
+  background: color-mix(in srgb, var(--err) 10%, transparent);
+}
+
+/* ============ ÉTAT VIDE (EMPTY STATE) ============ */
+.empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--card);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  color: var(--mut);
+}
+
+.empty-state svg {
+  color: color-mix(in srgb, var(--mut) 40%, transparent);
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: var(--ink);
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  margin: 0 0 1.5rem 0;
+  max-width: 400px;
+}
