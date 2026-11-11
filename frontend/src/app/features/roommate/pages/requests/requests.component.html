@@ -1,0 +1,41 @@
+<section class="rm narrow">
+  <nav class="subnav">
+    <a routerLink="/roommates" routerLinkActive="on" [routerLinkActiveOptions]="{exact:true}">Trouver un binôme</a>
+    <a routerLink="/roommates/me" routerLinkActive="on">Ma recherche</a>
+    <a routerLink="/roommates/requests" routerLinkActive="on">Demandes</a>
+  </nav>
+
+  <div class="seg" style="margin-bottom:1rem">
+    <button [class.on]="tab() === 'received'" (click)="tab.set('received')">📥 Reçues</button>
+    <button [class.on]="tab() === 'sent'" (click)="tab.set('sent')">📤 Envoyées</button>
+  </div>
+
+  @if (loading()) {
+    <div class="list">@for (i of [1,2,3]; track i) { <div class="req skeleton" style="height:80px"></div> }</div>
+  } @else if (list().length === 0) {
+    <div class="empty">
+      <div class="empty-ico">{{ tab() === 'received' ? '📭' : '✉️' }}</div>
+      <h3>Aucune demande {{ tab() === 'received' ? 'reçue' : 'envoyée' }}</h3>
+    </div>
+  } @else {
+    <div class="list">
+      @for (r of list(); track r.id; let i = $index) {
+        <div class="req" [style.animation-delay.ms]="i * 40">
+          <div class="txt">
+            <strong>{{ tab() === 'received' ? 'Demande de colocation reçue' : 'Demande envoyée' }}</strong>
+            @if (r.message) { <p>{{ r.message }}</p> }
+          </div>
+
+          @if (tab() === 'received' && r.status === 'PENDING') {
+            <div class="btns">
+              <button class="btn-ghost danger" (click)="respond(r, false)">Refuser</button>
+              <button class="btn-pri sm" (click)="respond(r, true)">Accepter</button>
+            </div>
+          } @else {
+            <span class="badge-st" [class]="'badge-st ' + r.status">{{ labels[r.status] ?? r.status }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,120 @@
+<section class="rm">
+  <nav class="subnav">
+    <a routerLink="/roommates" routerLinkActive="on" [routerLinkActiveOptions]="{exact:true}">Trouver un binôme</a>
+    <a routerLink="/roommates/me" routerLinkActive="on">Ma recherche</a>
+    <a routerLink="/roommates/requests" routerLinkActive="on">Demandes</a>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Colocation</span>
+      <h1>Trouve ton binôme idéal</h1>
+      <p>Classés par compatibilité avec ton profil.</p>
+    </div>
+    <a class="btn-pri" routerLink="/roommates/me">
+      {{ hasProfile() ? 'Modifier ma recherche' : 'Publier ma recherche' }}
+    </a>
+  </header>
+
+  @if (hasProfile() === false) {
+    <div class="empty">
+      <div class="empty-ico">📝</div>
+      <h3>Publie d'abord ta recherche</h3>
+      <p>Pour voir les compatibilités, décris ce que tu cherches et ton mode de vie.</p>
+      <a class="btn-pri" routerLink="/roommates/me">Créer ma recherche</a>
+    </div>
+  } @else {
+    <div class="filters">
+      <div class="seg">
+        <button [class.on]="kind() === ''" (click)="setKind('')">Tous</button>
+        <button [class.on]="kind() === 'ROOM'" (click)="setKind('ROOM')">🛏️ Chambre</button>
+        <button [class.on]="kind() === 'HOUSE'" (click)="setKind('HOUSE')">🏡 Maison</button>
+      </div>
+
+      <select (change)="setCity($any($event.target).value)">
+        <option value="">Toutes les villes</option>
+        @for (c of cities(); track c.id) { <option [value]="c.id">{{ c.name }}</option> }
+      </select>
+
+      <label class="range">
+        <span>Compatibilité min. <strong>{{ minScore() }}%</strong></span>
+        <input type="range" min="0" max="100" step="5" [value]="minScore()"
+               (input)="setScore($any($event.target).value)" />
+      </label>
+    </div>
+
+    @if (loading()) {
+      <div class="grid">@for (i of [1,2,3,4,5,6]; track i) { <div class="card skeleton"></div> }</div>
+    } @else if (visible().length === 0) {
+      <div class="empty">
+        <div class="empty-ico">🔍</div>
+        <h3>Aucun profil pour le moment</h3>
+        <p>Baisse la compatibilité minimale ou change de ville.</p>
+      </div>
+    } @else {
+      <p class="count">{{ visible().length }} profil{{ visible().length > 1 ? 's' : '' }}</p>
+      <div class="grid">
+        @for (m of visible(); track m.profile.user_id; let i = $index) {
+          <article class="card" [style.animation-delay.ms]="i * 50">
+            <div class="card-head">
+              <span class="avatar">{{ initials(m.display_name) }}</span>
+              <div class="who">
+                <h3>{{ m.display_name }}</h3>
+                <p class="loc">📍 {{ cityName(m.profile.city_id) || 'Ville non précisée' }}</p>
+              </div>
+              <svg class="ring" viewBox="0 0 52 52">
+                <circle class="ring-bg" cx="26" cy="26" r="22" />
+                <circle class="ring-fg" [class.mid]="m.score < 70" [class.low]="m.score < 40"
+                        cx="26" cy="26" r="22" transform="rotate(-90 26 26)"
+                        [attr.stroke-dasharray]="(m.score * 1.382) + ' 138.2'" />
+                <text x="26" y="30" text-anchor="middle">{{ m.score }}%</text>
+              </svg>
+            </div>
+
+            @if (m.profile.looking_for) {
+              <span class="kind" [class.house]="m.profile.looking_for === 'HOUSE'">
+                {{ m.profile.looking_for === 'ROOM' ? '🛏️ Cherche une chambre' : '🏡 Cherche une maison' }}
+              </span>
+            }
+
+            @if (m.profile.about) { <p class="about">{{ m.profile.about }}</p> }
+
+            <div class="chips">
+              <span>{{ m.profile.smoker ? '🚬 Fumeur' : '🚭 Non-fumeur' }}</span>
+              <span>{{ m.profile.has_pets ? '🐾 Animaux' : 'Sans animaux' }}</span>
+              <span>{{ schedules[m.profile.schedule] }}</span>
+            </div>
+
+            <div class="meta">
+              @if (m.profile.budget_min != null || m.profile.budget_max != null) {
+                <div><small>Budget</small>
+                  <strong>{{ m.profile.budget_min | number:'1.0-0' }}–{{ m.profile.budget_max | number:'1.0-0' }} DT</strong></div>
+              }
+              <div><small>Propreté</small>
+                <span class="dots">@for (l of levels; track l) { <i [class.on]="l <= m.profile.cleanliness"></i> }</span></div>
+              <div><small>Sociabilité</small>
+                <span class="dots">@for (l of levels; track l) { <i [class.on]="l <= m.profile.sociability"></i> }</span></div>
+            </div>
+
+            <footer>
+              <button class="btn-pri sm" (click)="contact(m)">Contacter</button>
+            </footer>
+          </article>
+        }
+      </div>
+    }
+  }
+</section>
+
+@if (target(); as t) {
+  <div class="backdrop" (click)="target.set(null)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Contacter {{ t.display_name }}</h3>
+      <textarea rows="4" [value]="msg" (input)="msg = $any($event.target).value"></textarea>
+      <div class="modal-actions">
+        <button class="btn-ghost" (click)="target.set(null)">Annuler</button>
+        <button class="btn-pri sm" [disabled]="sending()" (click)="send()">Envoyer</button>
+      </div>
+    </div>
+  </div>
+}

@@ -24,7 +24,7 @@ class RoommateProfileModel(Base):
     sociability: Mapped[int] = mapped_column(Integer, default=3)
     about: Mapped[str | None] = mapped_column(Text)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-
+    looking_for: Mapped[str] = mapped_column(String(10), default="ROOM")   # ROOM | HOUSE
 
 class RoommateRequestModel(Base):
     __tablename__ = "roommate_request"

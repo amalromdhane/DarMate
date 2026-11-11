@@ -1,0 +1,76 @@
+<section class="rm narrow">
+  <nav class="subnav">
+    <a routerLink="/roommates" routerLinkActive="on" [routerLinkActiveOptions]="{exact:true}">Trouver un binôme</a>
+    <a routerLink="/roommates/me" routerLinkActive="on">Ma recherche</a>
+    <a routerLink="/roommates/requests" routerLinkActive="on">Demandes</a>
+  </nav>
+
+  <form class="panel" [formGroup]="form" (ngSubmit)="submit()">
+    <h2>{{ isNew() ? 'Publier ma recherche' : 'Modifier ma recherche' }}</h2>
+    <p class="sub">Ces informations servent à calculer ta compatibilité avec les autres chercheurs.</p>
+
+    <div>
+      <span class="lbl">Je cherche</span>
+      <div class="tiles" style="margin-top:.4rem">
+        <button type="button" class="tile" [class.on]="v().looking_for === 'ROOM'" (click)="setKind('ROOM')">
+          <span class="emoji">🛏️</span><strong>Une chambre</strong>
+          <small>Dans un logement partagé.</small>
+        </button>
+        <button type="button" class="tile" [class.on]="v().looking_for === 'HOUSE'" (click)="setKind('HOUSE')">
+          <span class="emoji">🏡</span><strong>Une maison</strong>
+          <small>Un binôme pour louer ensemble.</small>
+        </button>
+      </div>
+    </div>
+
+    <label>Ville
+      <select formControlName="city_id">
+        <option [ngValue]="null" disabled>Choisir une ville</option>
+        @for (c of cities(); track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
+      </select>
+    </label>
+
+    <div class="row">
+      <label>Budget min (DT) <input type="number" min="0" formControlName="budget_min" /></label>
+      <label>Budget max (DT) <input type="number" min="0" formControlName="budget_max" /></label>
+    </div>
+    @if (!budgetOk()) { <p class="err">Le minimum doit être inférieur au maximum.</p> }
+
+    <div>
+      <span class="lbl">Rythme de vie</span>
+      <div class="seg" style="margin-top:.4rem">
+        @for (s of schedules; track s.value) {
+          <button type="button" [class.on]="v().schedule === s.value" (click)="setSchedule(s.value)">{{ s.label }}</button>
+        }
+      </div>
+    </div>
+
+    <div class="switches">
+      <label class="switch"><input type="checkbox" formControlName="smoker" /><span class="track"></span> Je fume</label>
+      <label class="switch"><input type="checkbox" formControlName="has_pets" /><span class="track"></span> J'ai des animaux</label>
+    </div>
+
+    <label class="slider">
+      <span>Propreté <strong>{{ v().cleanliness }}/5</strong></span>
+      <input type="range" min="1" max="5" step="1" formControlName="cleanliness" />
+    </label>
+    <label class="slider">
+      <span>Sociabilité <strong>{{ v().sociability }}/5</strong></span>
+      <input type="range" min="1" max="5" step="1" formControlName="sociability" />
+    </label>
+
+    <label>À propos de moi
+      <textarea rows="4" maxlength="1000" formControlName="about"
+                placeholder="Études ou travail, habitudes, ce que tu attends d'un colocataire…"></textarea>
+    </label>
+
+    <label class="switch"><input type="checkbox" formControlName="is_active" /><span class="track"></span> Ma recherche est visible par les autres</label>
+
+    <div class="actions">
+      <a class="btn-ghost" routerLink="/roommates">Annuler</a>
+      <button type="submit" class="btn-pri" [disabled]="busy() || form.invalid || !budgetOk()">
+        {{ busy() ? 'Enregistrement…' : 'Enregistrer' }}
+      </button>
+    </div>
+  </form>
+</section>

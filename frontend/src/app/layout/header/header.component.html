@@ -26,12 +26,11 @@
 
     <nav class="nav" [class.open]="mobileOpen()">
 
+
       <!-- Logements : tous les utilisateurs -->
 
 
       @if (auth.isLoggedIn()) {
-
-      <!-- CHERCHEUR -->
       @if (auth.isSeeker()) {
 
       <a routerLink="/properties" routerLinkActive="on" (click)="closeAll()">
@@ -45,6 +44,7 @@
       <a routerLink="/rental-requests" routerLinkActive="on" (click)="closeAll()">
         Mes demandes
       </a>
+      <a routerLink="/roommates" routerLinkActive="on" (click)="closeMobile()">Colocataires</a>
       }
 
       <!-- PROPRIÉTAIRE -->
