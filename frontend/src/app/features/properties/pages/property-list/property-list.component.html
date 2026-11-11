@@ -45,10 +45,6 @@
     @for (a of active(); track a.key) { <span class="tagx">{{ a.label }} <button type="button" (click)="clear(a.key)" [attr.aria-label]="'Retirer ' + a.label"><app-icon name="x" [size]="12" /></button></span> }
     @if (active().length) { <button type="button" class="link" (click)="resetAll()"><app-icon name="reset" [size]="14" /> Tout effacer</button> }
   </div>
-  <div class="row">
-    <select formControlName="sort" aria-label="Trier"><option value="recent">Plus récents</option><option value="price_asc">Prix croissant</option><option value="price_desc">Prix décroissant</option></select>
-    @if (loggedIn()) { <button type="button" class="alt" (click)="saveSearch()"><app-icon name="star" [size]="16" /> Créer une alerte</button> }
-  </div>
 </div>
 
 @if (loading()) {

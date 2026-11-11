@@ -15,8 +15,10 @@ export interface Conversation { id: number; title?: string; unread_count?: numbe
 export interface ChatMessage { id: number; sender_id: number; body: string | null; attachment?: { id: number; original_name: string } | null; }
 export interface AppNotification { id: number; title: string; body?: string; is_read: boolean; }
 export interface NotificationList { items: AppNotification[]; unread_count: number; }
-export interface RoommateProfile { user_id: number; bio?: string; budget_max?: number | null; city_id?: number | null; }
+export type Schedule = 'EARLY' | 'NIGHT' | 'FLEXIBLE';
+export interface RoommateProfile {id?: number; user_id: number; city_id?: number | null;budget_min?: number | string | null; budget_max?: number | string | null;smoker: boolean; has_pets: boolean; schedule: Schedule;cleanliness: number; sociability: number;about?: string | null; is_active: boolean;looking_for?: 'ROOM' | 'HOUSE';}
 export interface RoommateMatch { profile: RoommateProfile; display_name: string; score: number; }
+export interface RoommateRequest { id: number; status: string; message?: string | null; sender_id?: number; receiver_id?: number; created_at?: string; }
 export interface Group { id: number; name: string; max_members: number; members?: { user_id: number }[]; }
 export interface Invitation { id: number; group_id: number; status: string; }
 export interface Review { id: number; rating: number; comment?: string; }

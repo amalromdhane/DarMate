@@ -10,8 +10,9 @@ from app.domain.repositories import ports
 from app.domain.services.compatibility import CompatibilityWeights, compatibility_score
 
 SCHEDULES = {"EARLY", "NIGHT", "FLEXIBLE"}
+LOOKING_FOR = {"ROOM", "HOUSE"}
 PROFILE_FIELDS = {"city_id", "budget_min", "budget_max", "smoker", "has_pets", "schedule",
-                  "cleanliness", "sociability", "about", "is_active"}
+                  "cleanliness", "sociability", "about", "is_active", "looking_for"}
 
 
 class UpsertRoommateProfile:
@@ -25,6 +26,8 @@ class UpsertRoommateProfile:
                 setattr(profile, k, v)
         if profile.schedule not in SCHEDULES:
             raise ValidationFailedError("Rythme de vie invalide.")
+        if getattr(profile, "looking_for", "ROOM") not in LOOKING_FOR:
+            raise ValidationFailedError("Choisissez une chambre ou une maison.")
         if not (1 <= profile.cleanliness <= 5 and 1 <= profile.sociability <= 5):
             raise ValidationFailedError("Les niveaux de propreté et de sociabilité vont de 1 à 5.")
         if profile.budget_min is not None and profile.budget_max is not None and profile.budget_min > profile.budget_max:

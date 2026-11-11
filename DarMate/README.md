@@ -14,7 +14,7 @@ notifications, avis, administration.
 2. **Backend** :
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate     # Windows : .venv\Scripts\activate
+python -m venv .venv && source .venv\Scripts\activate    # Windows : .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env      # renseigner DB_PASSWORD, JWT_SECRET_KEY, ADMIN_PASSWORD
 alembic upgrade head      # crée les tables (ou importez database/schema.sql)
