@@ -1,84 +1,255 @@
-@if (property(); as p) {
-  <a class="back" routerLink="/properties"><app-icon name="left" [size]="18" /> Retour aux logements</a>
-  <header class="head">
-    <div>
-      <div class="badges">
-        @if (p.category_name) { <span class="b blue"><app-icon name="building" [size]="14" /> {{ p.category_name }}</span> }
-        @if (coliving(p)) { <span class="b violet"><app-icon name="users" [size]="14" /> Colocation · {{ p.max_roommates }} max</span> }
-        @if (p.status === 'AVAILABLE') { <span class="b green"><app-icon name="check" [size]="14" /> Disponible</span> }
-      </div>
-      <h1>{{ p.title }}</h1>
-      <p class="loc"><app-icon name="pin" [size]="16" /> {{ p.address || p.city_name }}@if (p.address && p.city_name) { , {{ p.city_name }} }</p>
+<!-- @if (property(); as p) {
+<a class="back" routerLink="/properties"><app-icon name="left" [size]="18" /> Retour aux logements</a>
+<header class="head">
+  <div>
+    <div class="badges">
+      @if (p.category_name) { <span class="b blue"><app-icon name="building" [size]="14" /> {{ p.category_name }}</span>
+      }
+      @if (coliving(p)) { <span class="b violet"><app-icon name="users" [size]="14" /> Colocation · {{ p.max_roommates
+        }} max</span> }
+      @if (p.status === 'AVAILABLE') { <span class="b green"><app-icon name="check" [size]="14" /> Disponible</span> }
     </div>
-    <div class="priceTag"><b>{{ p.price }} DT</b><span>/ mois</span></div>
-  </header>
-
-  <section class="gallery">
-    @if (gallery().length) {
-      <div class="hero">
-        <img [src]="gallery()[sel()]" alt="Photo {{ sel() + 1 }} de {{ p.title }}">
-        @if (gallery().length > 1) {
-          <button type="button" class="nav prev" aria-label="Photo précédente" (click)="move(-1)"><app-icon name="left" /></button>
-          <button type="button" class="nav next" aria-label="Photo suivante" (click)="move(1)"><app-icon name="right" /></button>
-          <span class="count">{{ sel() + 1 }} / {{ gallery().length }}</span>
-        }
-      </div>
-      @if (gallery().length > 1) { <div class="thumbs">@for (u of gallery(); track u; let i = $index) { <button type="button" [class.on]="i === sel()" (click)="sel.set(i)" [attr.aria-label]="'Voir la photo ' + (i + 1)"><img [src]="u" alt=""></button> }</div> }
-    } @else { <div class="hero none"><app-icon name="home" [size]="56" /><span>Aucune photo pour le moment</span></div> }
-  </section>
-
-  <div class="layout">
-    <div class="main">
-      <section class="facts">
-        @if (p.rooms) { <div class="fact"><span class="ic c1"><app-icon name="bed" /></span><b>{{ p.rooms }}</b><small>Pièces</small></div> }
-        @if (p.surface_m2) { <div class="fact"><span class="ic c2"><app-icon name="area" /></span><b>{{ p.surface_m2 }} m²</b><small>Surface</small></div> }
-        @if (p.available_from) { <div class="fact"><span class="ic c3"><app-icon name="calendar" /></span><b>{{ p.available_from | date: 'dd/MM/yyyy' }}</b><small>Disponible dès</small></div> }
-        <div class="fact"><span class="ic c4"><app-icon name="users" /></span><b>{{ coliving(p) ? p.max_roommates + ' max' : 'Non' }}</b><small>Colocation</small></div>
-      </section>
-      <section class="block"><h2><app-icon name="file" [size]="22" /> Description</h2><p class="txt">{{ p.description || 'Aucune description.' }}</p></section>
-      @if (p.conditions) { <section class="block"><h2><app-icon name="shield" [size]="22" /> Conditions de location</h2><p class="txt">{{ p.conditions }}</p></section> }
-      <section class="block">
-        <h2><app-icon name="star" [size]="22" /> Avis @if (reviews(); as r) { <small>({{ r.count }}@if (r.average) { · {{ r.average }}/5 }) </small> }</h2>
-        @for (x of reviews()?.items ?? []; track x.id) {
-          <div class="rev"><span class="stars">@for (s of stars; track s) { <app-icon name="star" [size]="16" [filled]="s <= x.rating" /> }</span><p>{{ x.comment }}</p></div>
-        } @empty { <p class="muted">Pas encore d’avis pour ce logement.</p> }
-      </section>
-    </div>
-
-    <aside class="side">
-      <div class="box">
-        <div class="boxPrice"><b>{{ p.price }} DT</b> <span>/ mois</span></div>
-        <div class="tabs" role="tablist">
-          <button type="button" role="tab" [class.on]="tab() === 'rent'" (click)="tab.set('rent')"><app-icon name="key" [size]="16" /> Louer</button>
-          <button type="button" role="tab" [class.on]="tab() === 'visit'" (click)="tab.set('visit')"><app-icon name="calendar" [size]="16" /> Visiter</button>
-        </div>
-        @if (tab() === 'rent') {
-          @if (sentRent()) {
-            <div class="ok"><app-icon name="check" [size]="30" /><h3>Demande envoyée !</h3><p>Le propriétaire va l’examiner.</p><a routerLink="/rental-requests">Suivre mes demandes</a><button type="button" class="alt" (click)="sentRent.set(false)">Nouvelle demande</button></div>
-          } @else {
-            <form [formGroup]="rentalForm" (ngSubmit)="requestRental()">
-              <label>Votre message<textarea formControlName="message" rows="4" placeholder="Présentez-vous, parlez de votre projet…"></textarea></label>
-              @if (rentalForm.controls.message.touched && rentalForm.controls.message.invalid) { <small class="e">Écrivez au moins 10 caractères.</small> }
-              <label>Date d’emménagement souhaitée<input type="date" formControlName="desired_move_in" [min]="today"></label>
-              <button type="submit" class="cta"><app-icon name="send" [size]="18" /> Envoyer ma demande</button>
-            </form>
-          }
-        } @else {
-          @if (sentVisit()) {
-            <div class="ok"><app-icon name="check" [size]="30" /><h3>Visite demandée !</h3><p>Vous serez notifié de la réponse.</p><button type="button" class="alt" (click)="sentVisit.set(false)">Proposer un autre créneau</button></div>
-          } @else {
-            <form [formGroup]="visitForm" (ngSubmit)="requestVisit()">
-              <label><span class="lb"><app-icon name="clock" [size]="15" /> Début</span><input type="datetime-local" formControlName="starts_at" [min]="nowLocal"></label>
-              <label><span class="lb"><app-icon name="clock" [size]="15" /> Fin</span><input type="datetime-local" formControlName="ends_at" [min]="nowLocal"></label>
-              @if (visitForm.touched && visitForm.invalid) { <small class="e">Choisissez un début et une fin.</small> }
-              <label>Note (facultatif)<input formControlName="note" placeholder="Ex. : plutôt en soirée"></label>
-              <button type="submit" class="cta"><app-icon name="calendar" [size]="18" /> Demander la visite</button>
-            </form>
-          }
-        }
-        <button type="button" class="alt contact" (click)="contact()"><app-icon name="message" [size]="18" /> Contacter le propriétaire</button>
-      </div>
-    </aside>
+    <h1>{{ p.title }}</h1>
+    <p class="loc"><app-icon name="pin" [size]="16" /> {{ p.address || p.city_name }}@if (p.address && p.city_name) { ,
+      {{ p.city_name }} }</p>
   </div>
-} @else { <p>Chargement…</p> }
+  <div class="priceTag"><b>{{ p.price }} DT</b><span>/ mois</span></div>
+</header>
 
+<section class="gallery">
+  @if (gallery().length) {
+  <div class="hero">
+    <img class="bg" [src]="gallery()[sel()]" alt="" aria-hidden="true">
+    <img class="fg" [src]="gallery()[sel()]" alt="Photo {{ sel() + 1 }} de {{ p.title }}">
+    @if (gallery().length > 1) {
+    <button type="button" class="nav prev" aria-label="Photo précédente" (click)="move(-1)"><app-icon
+        name="left" /></button>
+    <button type="button" class="nav next" aria-label="Photo suivante" (click)="move(1)"><app-icon
+        name="right" /></button>
+    <span class="count">{{ sel() + 1 }} / {{ gallery().length }}</span>
+    }
+  </div>
+  @if (gallery().length > 1) { <div class="thumbs">@for (u of gallery(); track u; let i = $index) { <button
+      type="button" [class.on]="i === sel()" (click)="sel.set(i)" [attr.aria-label]="'Voir la photo ' + (i + 1)"><img
+        [src]="u" alt=""></button> }</div> }
+  } @else { <div class="hero none"><app-icon name="home" [size]="56" /><span>Aucune photo pour le moment</span></div> }
+</section>
+
+<div class="layout">
+  <div class="main">
+    <section class="facts">
+      @if (p.rooms) { <div class="fact"><span class="ic c1"><app-icon name="bed" /></span><b>{{ p.rooms
+          }}</b><small>Pièces</small></div> }
+      @if (p.surface_m2) { <div class="fact"><span class="ic c2"><app-icon name="area" /></span><b>{{ p.surface_m2 }}
+          m²</b><small>Surface</small></div> }
+      @if (p.available_from) { <div class="fact"><span class="ic c3"><app-icon name="calendar" /></span><b>{{
+          p.available_from | date: 'dd/MM/yyyy' }}</b><small>Disponible dès</small></div> }
+      <div class="fact"><span class="ic c4"><app-icon name="users" /></span><b>{{ coliving(p) ? p.max_roommates + ' max'
+          : 'Non' }}</b><small>Colocation</small></div>
+    </section>
+    <section class="block">
+      <h2><app-icon name="file" [size]="22" /> Description</h2>
+      <p class="txt">{{ p.description || 'Aucune description.' }}</p>
+    </section>
+    @if (p.conditions) { <section class="block">
+      <h2><app-icon name="shield" [size]="22" /> Conditions de location</h2>
+      <p class="txt">{{ p.conditions }}</p>
+    </section> }
+    <section class="block">
+      <h2><app-icon name="star" [size]="22" /> Avis @if (reviews(); as r) { <small>({{ r.count }}@if (r.average) { · {{
+          r.average }}/5 }) </small> }</h2>
+      @for (x of reviews()?.items ?? []; track x.id) {
+      <div class="rev"><span class="stars">@for (s of stars; track s) { <app-icon name="star" [size]="16"
+            [filled]="s <= x.rating" /> }</span>
+        <p>{{ x.comment }}</p>
+      </div>
+      } @empty { <p class="muted">Pas encore d’avis pour ce logement.</p> }
+    </section>
+  </div>
+
+  <aside class="side">
+    <div class="box">
+      <div class="boxPrice"><b>{{ p.price }} DT</b> <span>/ mois</span></div>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" [class.on]="tab() === 'rent'" (click)="tab.set('rent')"><app-icon name="key"
+            [size]="16" /> Louer</button>
+        <button type="button" role="tab" [class.on]="tab() === 'visit'" (click)="tab.set('visit')"><app-icon
+            name="calendar" [size]="16" /> Visiter</button>
+      </div>
+      @if (tab() === 'rent') {
+      @if (sentRent()) {
+      <div class="ok"><app-icon name="check" [size]="30" />
+        <h3>Demande envoyée !</h3>
+        <p>Le propriétaire va l’examiner.</p><a routerLink="/rental-requests">Suivre mes demandes</a><button
+          type="button" class="alt" (click)="sentRent.set(false)">Nouvelle demande</button>
+      </div>
+      } @else {
+      <form [formGroup]="rentalForm" (ngSubmit)="requestRental()">
+        <label>Votre message<textarea formControlName="message" rows="4"
+            placeholder="Présentez-vous, parlez de votre projet…"></textarea></label>
+        @if (rentalForm.controls.message.touched && rentalForm.controls.message.invalid) { <small class="e">Écrivez au
+          moins 10 caractères.</small> }
+        <label>Date d’emménagement souhaitée<input type="date" formControlName="desired_move_in" [min]="today"></label>
+        <button type="submit" class="cta"><app-icon name="send" [size]="18" /> Envoyer ma demande</button>
+      </form>
+      }
+      } @else {
+      @if (sentVisit()) {
+      <div class="ok"><app-icon name="check" [size]="30" />
+        <h3>Visite demandée !</h3>
+        <p>Vous serez notifié de la réponse.</p><button type="button" class="alt"
+          (click)="sentVisit.set(false)">Proposer un autre créneau</button>
+      </div>
+      } @else {
+      <form [formGroup]="visitForm" (ngSubmit)="requestVisit()">
+        <label><span class="lb"><app-icon name="clock" [size]="15" /> Début</span><input type="datetime-local"
+            formControlName="starts_at" [min]="nowLocal"></label>
+        <label><span class="lb"><app-icon name="clock" [size]="15" /> Fin</span><input type="datetime-local"
+            formControlName="ends_at" [min]="nowLocal"></label>
+        @if (visitForm.touched && visitForm.invalid) { <small class="e">Choisissez un début et une fin.</small> }
+        <label>Note (facultatif)<input formControlName="note" placeholder="Ex. : plutôt en soirée"></label>
+        <button type="submit" class="cta"><app-icon name="calendar" [size]="18" /> Demander la visite</button>
+      </form>
+      }
+      }
+      <button type="button" class="alt contact" (click)="contact()"><app-icon name="message" [size]="18" /> Contacter le
+        propriétaire</button>
+    </div>
+  </aside>
+</div>
+} @else { <p>Chargement…</p> } -->
+
+@if (property(); as p) {
+<a class="back" routerLink="/properties"><app-icon name="left" [size]="18" /> Retour aux logements</a>
+<header class="head">
+  <div>
+    <div class="badges">
+      @if (p.category_name) { <span class="b blue"><app-icon name="building" [size]="14" /> {{ p.category_name }}</span>
+      }
+      @if (coliving(p)) { <span class="b violet"><app-icon name="users" [size]="14" /> Colocation · {{ p.max_roommates
+        }} max</span> }
+      @if (p.status === 'AVAILABLE') { <span class="b green"><app-icon name="check" [size]="14" /> Disponible</span> }
+    </div>
+    <h1>{{ p.title }}</h1>
+    <p class="loc"><app-icon name="pin" [size]="16" /> {{ p.address || p.city_name }}@if (p.address && p.city_name) { ,
+      {{ p.city_name }} }</p>
+  </div>
+  <div class="priceTag"><b>{{ p.price }} DT</b><span>/ mois</span></div>
+</header>
+
+<section class="gallery">
+  @if (gallery().length) {
+  <div class="hero">
+    <img class="bg" [src]="gallery()[sel()]" alt="" aria-hidden="true">
+    <img class="fg" [src]="gallery()[sel()]" alt="Photo {{ sel() + 1 }} de {{ p.title }}">
+    @if (gallery().length > 1) {
+    <button type="button" class="nav prev" aria-label="Photo précédente" (click)="move(-1)"><app-icon
+        name="left" /></button>
+    <button type="button" class="nav next" aria-label="Photo suivante" (click)="move(1)"><app-icon
+        name="right" /></button>
+    <span class="count">{{ sel() + 1 }} / {{ gallery().length }}</span>
+    }
+  </div>
+  @if (gallery().length > 1) { <div class="thumbs">@for (u of gallery(); track u; let i = $index) { <button
+      type="button" [class.on]="i === sel()" (click)="sel.set(i)" [attr.aria-label]="'Voir la photo ' + (i + 1)"><img
+        [src]="u" alt=""></button> }</div> }
+  } @else { <div class="hero none"><app-icon name="home" [size]="56" /><span>Aucune photo pour le moment</span></div> }
+</section>
+
+<!-- NEW : une seule colonne quand l'utilisateur connecté ne peut pas agir -->
+<div class="layout" [class.solo]="auth.isLoggedIn() && !canAct(p)">
+  <div class="main">
+    <section class="facts">
+      @if (p.rooms) { <div class="fact"><span class="ic c1"><app-icon name="bed" /></span><b>{{ p.rooms
+          }}</b><small>Pièces</small></div> }
+      @if (p.surface_m2) { <div class="fact"><span class="ic c2"><app-icon name="area" /></span><b>{{ p.surface_m2 }}
+          m²</b><small>Surface</small></div> }
+      @if (p.available_from) { <div class="fact"><span class="ic c3"><app-icon name="calendar" /></span><b>{{
+          p.available_from | date: 'dd/MM/yyyy' }}</b><small>Disponible dès</small></div> }
+      <div class="fact"><span class="ic c4"><app-icon name="users" /></span><b>{{ coliving(p) ? p.max_roommates + ' max'
+          : 'Non' }}</b><small>Colocation</small></div>
+    </section>
+    <section class="block">
+      <h2><app-icon name="file" [size]="22" /> Description</h2>
+      <p class="txt">{{ p.description || 'Aucune description.' }}</p>
+    </section>
+    @if (p.conditions) { <section class="block">
+      <h2><app-icon name="shield" [size]="22" /> Conditions de location</h2>
+      <p class="txt">{{ p.conditions }}</p>
+    </section> }
+    <section class="block">
+      <h2><app-icon name="star" [size]="22" /> Avis @if (reviews(); as r) { <small>({{ r.count }}@if (r.average) { · {{
+          r.average }}/5 }) </small> }</h2>
+      @for (x of reviews()?.items ?? []; track x.id) {
+      <div class="rev"><span class="stars">@for (s of stars; track s) { <app-icon name="star" [size]="16"
+            [filled]="s <= x.rating" /> }</span>
+        <p>{{ x.comment }}</p>
+      </div>
+      } @empty { <p class="muted">Pas encore d’avis pour ce logement.</p> }
+    </section>
+  </div>
+
+  <!-- NEW : bloc Louer / Visiter / Contacter réservé au chercheur -->
+  @if (canAct(p)) {
+  <aside class="side">
+    <div class="box">
+      <div class="boxPrice"><b>{{ p.price }} DT</b> <span>/ mois</span></div>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" [class.on]="tab() === 'rent'" (click)="tab.set('rent')"><app-icon name="key"
+            [size]="16" /> Louer</button>
+        <button type="button" role="tab" [class.on]="tab() === 'visit'" (click)="tab.set('visit')"><app-icon
+            name="calendar" [size]="16" /> Visiter</button>
+      </div>
+      @if (tab() === 'rent') {
+      @if (sentRent()) {
+      <div class="ok"><app-icon name="check" [size]="30" />
+        <h3>Demande envoyée !</h3>
+        <p>Le propriétaire va l’examiner.</p><a routerLink="/rental-requests">Suivre mes demandes</a><button
+          type="button" class="alt" (click)="sentRent.set(false)">Nouvelle demande</button>
+      </div>
+      } @else {
+      <form [formGroup]="rentalForm" (ngSubmit)="requestRental()">
+        <label>Votre message<textarea formControlName="message" rows="4"
+            placeholder="Présentez-vous, parlez de votre projet…"></textarea></label>
+        @if (rentalForm.controls.message.touched && rentalForm.controls.message.invalid) { <small class="e">Écrivez au
+          moins 10 caractères.</small> }
+        <label>Date d’emménagement souhaitée<input type="date" formControlName="desired_move_in" [min]="today"></label>
+        <button type="submit" class="cta"><app-icon name="send" [size]="18" /> Envoyer ma demande</button>
+      </form>
+      }
+      } @else {
+      @if (sentVisit()) {
+      <div class="ok"><app-icon name="check" [size]="30" />
+        <h3>Visite demandée !</h3>
+        <p>Vous serez notifié de la réponse.</p><button type="button" class="alt"
+          (click)="sentVisit.set(false)">Proposer un autre créneau</button>
+      </div>
+      } @else {
+      <form [formGroup]="visitForm" (ngSubmit)="requestVisit()">
+        <label><span class="lb"><app-icon name="clock" [size]="15" /> Début</span><input type="datetime-local"
+            formControlName="starts_at" [min]="nowLocal"></label>
+        <label><span class="lb"><app-icon name="clock" [size]="15" /> Fin</span><input type="datetime-local"
+            formControlName="ends_at" [min]="nowLocal"></label>
+        @if (visitForm.touched && visitForm.invalid) { <small class="e">Choisissez un début et une fin.</small> }
+        <label>Note (facultatif)<input formControlName="note" placeholder="Ex. : plutôt en soirée"></label>
+        <button type="submit" class="cta"><app-icon name="calendar" [size]="18" /> Demander la visite</button>
+      </form>
+      }
+      }
+      <button type="button" class="alt contact" (click)="contact()"><app-icon name="message" [size]="18" /> Contacter le
+        propriétaire</button>
+    </div>
+  </aside>
+  } @else if (!auth.isLoggedIn()) {
+  <!-- NEW : visiteur non connecté -->
+  <aside class="side">
+    <div class="box">
+      <div class="boxPrice"><b>{{ p.price }} DT</b> <span>/ mois</span></div>
+      <p class="muted">Connectez-vous avec un compte chercheur pour louer, visiter ou contacter le propriétaire.</p>
+      <a class="cta" routerLink="/auth/login">Se connecter</a>
+      <a routerLink="/auth/register">Créer un compte</a>
+    </div>
+  </aside>
+  }
+</div>
+} @else { <p>Chargement…</p> }

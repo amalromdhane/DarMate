@@ -10,10 +10,11 @@ from app.domain.entities.enums import NotificationType, PropertyStatus, RoleName
 from app.domain.repositories import ports
 from app.domain.repositories.ports import PropertySearchCriteria
 from app.domain.services.rental_rules import matches_filters
+from app.core.images import check_image
 
 EDITABLE = {"city_id", "category_id", "title", "description", "price", "rooms", "surface_m2", "address",
             "latitude", "longitude", "coliving_allowed", "max_roommates", "conditions", "available_from"}
-MAX_IMAGES = 10
+MAX_IMAGES = 5
 PUBLIC_STATUSES = (PropertyStatus.AVAILABLE, PropertyStatus.RENTED)
 
 
@@ -216,6 +217,7 @@ class AddPropertyImage:
         self.access.owned(actor, property_id)
         if len(self.images.list_for_properties([property_id])[property_id]) >= MAX_IMAGES:
             raise ConflictError(f"Une annonce peut contenir au maximum {MAX_IMAGES} photos.")
+        check_image(file.data)          # vérifie le contenu réel et les dimensions
         path = self.storage.save("properties", file, IMAGE_MIMES, settings.max_image_mb * 1024 * 1024, private=False)
         img = self.images.add(e.PropertyImage(property_id=property_id, path=path, position=self.images.next_position(property_id)))
         self.audit.log(actor.id, "property.image_add", "property", property_id)

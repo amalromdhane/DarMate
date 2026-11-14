@@ -17,3 +17,4 @@ a{text-decoration:none;color:inherit}
 .body{padding:.8rem 1rem 1rem}a{text-decoration:none;color:inherit}h3{margin:0 0 .2rem;font-size:1.1rem}
 .loc{margin:0;color:var(--mut);display:flex;gap:.3rem;align-items:center}
 .facts{list-style:none;margin:.6rem 0 0;padding:0;display:flex;gap:.9rem;flex-wrap:wrap;color:var(--mut);font-size:.9rem}.facts li{display:inline-flex;gap:.3rem;align-items:center}
+.gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
