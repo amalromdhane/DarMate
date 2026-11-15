@@ -32,6 +32,8 @@ class RegisterCmd:
     last_name: str
     roles: list[str] = field(default_factory=lambda: [RoleName.SEEKER.value])
     phone: str | None = None
+    birth_date: date | None = None
+    city_id: int | None = None
 
 
 @dataclass

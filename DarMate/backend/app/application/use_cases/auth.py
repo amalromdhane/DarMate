@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from app.core.exceptions import ConflictError, ValidationFailedError
 from app.application.dto.dto import Actor, AuthResult, RegisterCmd
 from app.application.interfaces.services import EmailSender, PasswordHasher, TokenService, UnitOfWork
 from app.application.use_cases.common import AuditService
@@ -26,18 +27,22 @@ def clean_roles(roles: list[str]) -> list[str]:
 
 class RegisterUser:
     def __init__(self, users: ports.UserRepository, profiles: ports.UserProfileRepository,
-                 hasher: PasswordHasher, audit: AuditService, uow: UnitOfWork) -> None:
-        self.users, self.profiles, self.hasher, self.audit, self.uow = users, profiles, hasher, audit, uow
+                 cities: ports.CityRepository, hasher: PasswordHasher, audit: AuditService, uow: UnitOfWork) -> None:
+        self.users, self.profiles, self.cities = users, profiles, cities
+        self.hasher, self.audit, self.uow = hasher, audit, uow
 
     def execute(self, cmd: RegisterCmd) -> e.User:
         validate_password(cmd.password)
         roles = clean_roles(cmd.roles)
         email = cmd.email.strip().lower()
+        if cmd.city_id and not self.cities.get(cmd.city_id):
+            raise ValidationFailedError("Ville inconnue.")
         if self.users.get_by_email(email):
             raise ConflictError("Un compte existe déjà avec cette adresse e-mail.")
         user = self.users.add(e.User(email=email, password_hash=self.hasher.hash(cmd.password), status=UserStatus.ACTIVE))
         self.profiles.add(e.UserProfile(user_id=user.id, first_name=cmd.first_name.strip(),
-                                        last_name=cmd.last_name.strip(), phone=cmd.phone))
+                                        last_name=cmd.last_name.strip(), phone=cmd.phone,
+                                        birth_date=cmd.birth_date, city_id=cmd.city_id))
         self.users.set_roles(user.id, roles)
         self.audit.log(user.id, "user.register", "user", user.id)
         self.uow.commit()

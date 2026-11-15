@@ -122,7 +122,8 @@ def _token_out(r: AuthResult, db_user_view: UserView) -> s.TokenOut:
 def register(request: Request, body: s.RegisterIn, usecase: uc.RegisterUser = Depends(provide(uc.RegisterUser)),
              get_user: GetUser = Depends(provide(GetUser))):
     data = body.model_dump()
-    role = data.pop("role")                       # SEEKER ou OWNER (jamais ADMIN)
+    roles = data.pop("roles", None)
+    role = data.pop("role", None) or (roles[0] if roles else "SEEKER")   # SEEKER ou OWNER (jamais ADMIN)                     # SEEKER ou OWNER (jamais ADMIN)
     user = usecase.execute(RegisterCmd(**data, roles=[role]))
     return mappers.user_out(get_user.execute(user.id))
 

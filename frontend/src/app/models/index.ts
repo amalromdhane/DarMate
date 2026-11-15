@@ -1,4 +1,6 @@
-export interface User { id: number; email: string; first_name?: string; last_name?: string; phone?: string; bio?: string; roles?: string[]; status?: string; }
+export interface UserProfileData { first_name?: string; last_name?: string; phone?: string | null; bio?: string | null; birth_date?: string | null; city_id?: number | null; language?: string; }
+export interface User { id: number; email: string; first_name?: string; last_name?: string; phone?: string; bio?: string; roles?: string[]; status?: string; profile?: UserProfileData | null; created_at?: string | null; }
+export interface ProfileUpdate { first_name?: string; last_name?: string; phone?: string | null; bio?: string | null; birth_date?: string | null; language?: string; }
 export interface TokenOut { access_token: string; user: User; }
 export interface Page<T> { items: T[]; total: number; page: number; size: number; }
 export interface Msg { detail: string; }
