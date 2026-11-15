@@ -1,33 +1,83 @@
 <section class="profile">
-  <h1>Mon profil</h1>
+
+  <header class="hero">
+    <div class="avatar">{{ initials() }}</div>
+    <div class="who">
+      <h1>{{ fullName() || 'Mon profil' }}</h1>
+      <p class="mail">{{ me()?.email }}</p>
+      <div class="badges">
+        @for (r of roleLabels(); track r) { <span class="badge">{{ r }}</span> }
+        @if (statusLabel()) { <span class="badge st">{{ statusLabel() }}</span> }
+      </div>
+    </div>
+    @if (me()?.created_at) {
+      <div class="since"><small>Membre depuis</small><b>{{ me()?.created_at | date:'dd/MM/yyyy' }}</b></div>
+    }
+  </header>
 
   @if (message(); as m) {
-    <div class="alert" [class.err]="m.type === 'err'">{{ m.text }}</div>
+    <div class="alert" role="status" [class.err]="m.type === 'err'">{{ m.text }}</div>
   }
 
   <form class="card" [formGroup]="infoForm" (ngSubmit)="saveInfo()">
-    <h2>Informations personnelles</h2>
-    <div class="grid">
-      <label>Prénom <input formControlName="firstName" /></label>
-      <label>Nom <input formControlName="lastName" /></label>
-      <label>Email <input type="email" formControlName="email" /></label>
-      <label>Téléphone <input formControlName="phone" /></label>
+    <div class="card-head">
+      <h2>Informations personnelles</h2>
+      <p>Votre nom et votre bio apparaissent sur votre profil public.</p>
     </div>
-    <button class="btn" [disabled]="saving()">Enregistrer</button>
+
+    <div class="grid">
+      <label>Prénom
+        <input formControlName="first_name" autocomplete="given-name" />
+        @if (infoForm.controls.first_name.touched && infoForm.controls.first_name.invalid) { <span class="err-msg">Le prénom est obligatoire.</span> }
+      </label>
+      <label>Nom
+        <input formControlName="last_name" autocomplete="family-name" />
+        @if (infoForm.controls.last_name.touched && infoForm.controls.last_name.invalid) { <span class="err-msg">Le nom est obligatoire.</span> }
+      </label>
+      <label>Email
+        <input type="email" [value]="me()?.email ?? ''" readonly />
+        <span class="hint">L'adresse email ne peut pas être modifiée.</span>
+      </label>
+      <label>Téléphone
+        <input type="tel" formControlName="phone" autocomplete="tel" placeholder="+216 …" />
+      </label>
+           <label>Date de naissance
+        <input type="date" formControlName="birth_date" [max]="maxBirth" />
+        @if (infoForm.controls.birth_date.touched && infoForm.controls.birth_date.invalid) {
+          <span class="err-msg">Date invalide : 18 ans minimum, pas dans le futur.</span>
+        }
+      </label>
+     
+     
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="submit" [disabled]="saving() || infoForm.pristine">
+        {{ saving() ? 'Enregistrement…' : 'Enregistrer les modifications' }}
+      </button>
+    </div>
   </form>
 
   <form class="card" [formGroup]="pwdForm" (ngSubmit)="savePassword()">
-    <h2>Changer le mot de passe</h2>
-    <div class="grid">
-      <label>Mot de passe actuel <input type="password" formControlName="currentPassword" /></label>
-      <label>Nouveau mot de passe <input type="password" formControlName="newPassword" /></label>
+    <div class="card-head">
+      <h2>Sécurité</h2>
+      <p>Choisissez un mot de passe d'au moins 8 caractères.</p>
     </div>
-    <button class="btn">Modifier</button>
+
+    <div class="grid">
+      <label>Mot de passe actuel
+        <input [type]="showPwd() ? 'text' : 'password'" formControlName="current_password" autocomplete="current-password" />
+      </label>
+      <label>Nouveau mot de passe
+        <input [type]="showPwd() ? 'text' : 'password'" formControlName="new_password" autocomplete="new-password" />
+        @if (pwdForm.controls.new_password.touched && pwdForm.controls.new_password.invalid) { <span class="err-msg">8 caractères minimum.</span> }
+      </label>
+    </div>
+
+    <div class="actions between">
+      <label class="check"><input type="checkbox" [checked]="showPwd()" (change)="showPwd.set(!showPwd())" /> Afficher les mots de passe</label>
+      <button class="btn" type="submit" [disabled]="changing()">{{ changing() ? 'Modification…' : 'Modifier le mot de passe' }}</button>
+    </div>
   </form>
 
-  <div class="card danger-zone">
-    <h2>Zone dangereuse</h2>
-    <p>La suppression du compte est définitive.</p>
-    <button class="btn danger" type="button" (click)="deleteAccount()">Supprimer mon compte</button>
-  </div>
 </section>

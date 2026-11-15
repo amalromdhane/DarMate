@@ -91,8 +91,8 @@
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field
 
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from app.domain.entities.enums import UserStatus
 from app.presentation.schemas.common import ORM
 
@@ -102,8 +102,28 @@ class RegisterIn(BaseModel):
     password: str = Field(min_length=8, max_length=128)
     first_name: str = Field(min_length=1, max_length=80)
     last_name: str = Field(min_length=1, max_length=80)
-    role: Literal["SEEKER", "OWNER"]  # un seul rôle, choisi à l'inscription
-    phone: str | None = Field(default=None, max_length=30)
+    roles: list[str] = Field(default=["SEEKER"], min_length=1)
+    phone: str | None = Field(default=None, max_length=30, pattern=r"^\+?[0-9 ]{8,20}$")
+    birth_date: date | None = None
+    city_id: int | None = None
+
+    @field_validator("roles")
+    @classmethod
+    def only_one_public_role(cls, v):
+        if len(v) != 1 or v[0] not in {"OWNER", "SEEKER"}:
+            raise ValueError("Choisissez un seul rôle : OWNER ou SEEKER")
+        return v
+
+    @field_validator("birth_date")
+    @classmethod
+    def adult_only(cls, v):
+        if v is None:
+            return v
+        today = date.today()
+        age = today.year - v.year - ((today.month, today.day) < (v.month, v.day))
+        if age < 18 or age > 120:
+            raise ValueError("Vous devez avoir au moins 18 ans.")
+        return v
 
 
 class LoginIn(BaseModel):

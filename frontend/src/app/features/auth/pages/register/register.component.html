@@ -10,11 +10,10 @@
   <label><input type="radio" formControlName="role" value="SEEKER"> Je cherche un logement</label>
   <label><input type="radio" formControlName="role" value="OWNER"> Je suis propriétaire</label>
 </div> -->
-
 <h1>Créer un compte</h1>
-<p>Choisissez votre profil. Ce choix est définitif pour ce compte.</p>
+<p class="lead">Choisissez votre profil. Ce choix est définitif pour ce compte.</p>
 
-<form class="stack" [formGroup]="form" (ngSubmit)="submit()">
+<form class="stack" [formGroup]="form" (ngSubmit)="submit()" novalidate>
 
   <fieldset class="role-choice">
     <legend>Je m'inscris en tant que</legend>
@@ -32,10 +31,53 @@
     </label>
   </fieldset>
 
-  <input formControlName="first_name" placeholder="Prénom" autocomplete="given-name">
-  <input formControlName="last_name" placeholder="Nom" autocomplete="family-name">
-  <input formControlName="email" type="email" placeholder="E-mail" autocomplete="email">
-  <input formControlName="password" type="password" placeholder="Mot de passe (8 caractères min.)" autocomplete="new-password">
+  <div class="grid">
+    <label class="field">Prénom
+      <input formControlName="first_name" autocomplete="given-name" />
+      @if (invalid('first_name')) { <span class="err">Le prénom est obligatoire.</span> }
+    </label>
+    <label class="field">Nom
+      <input formControlName="last_name" autocomplete="family-name" />
+      @if (invalid('last_name')) { <span class="err">Le nom est obligatoire.</span> }
+    </label>
+    <label class="field">E-mail
+      <input type="email" formControlName="email" autocomplete="email" />
+      @if (invalid('email')) { <span class="err">Entrez une adresse e-mail valide.</span> }
+    </label>
+    <label class="field">Téléphone
+      <input type="tel" formControlName="phone" autocomplete="tel" placeholder="+216 12 345 678" />
+      @if (invalid('phone')) { <span class="err">Entrez un numéro valide (8 chiffres minimum).</span> }
+    </label>
+    <label class="field">Ville
+      <select formControlName="city_id">
+        <option [ngValue]="0" disabled>Choisir une ville</option>
+        @for (c of cities(); track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
+      </select>
+      @if (invalid('city_id')) { <span class="err">Choisissez une ville.</span> }
+    </label>
+    <label class="field">Date de naissance <small>(facultatif)</small>
+      <input type="date" formControlName="birth_date" [max]="maxBirth" />
+      @if (invalid('birth_date')) { <span class="err">Date invalide : 18 ans minimum, pas dans le futur.</span> }
+    </label>
+    <label class="field">Mot de passe
+      <input [type]="showPwd() ? 'text' : 'password'" formControlName="password" autocomplete="new-password" placeholder="8 caractères minimum" />
+      @if (invalid('password')) { <span class="err">8 caractères minimum.</span> }
+    </label>
+    <label class="field">Confirmer le mot de passe
+      <input [type]="showPwd() ? 'text' : 'password'" formControlName="confirm" autocomplete="new-password" />
+      @if (form.controls.confirm.touched && form.errors?.['mismatch']) { <span class="err">Les mots de passe ne correspondent pas.</span> }
+    </label>
+  </div>
 
-  <button [disabled]="form.invalid || busy()">Créer mon compte</button>
+  <label class="check"><input type="checkbox" [checked]="showPwd()" (change)="showPwd.set(!showPwd())" /> Afficher les mots de passe</label>
+
+  @if (showSummary() && form.invalid) {
+    <div class="alert" role="alert">
+      <strong>Complétez ces champs :</strong>
+      <ul>@for (m of missing(); track m) { <li>{{ m }}</li> }</ul>
+    </div>
+  }
+
+  <button type="submit" class="btn" [disabled]="busy()">{{ busy() ? 'Création…' : 'Créer mon compte' }}</button>
+  <p class="alt">Déjà inscrit ? <a routerLink="/auth/login">Se connecter</a></p>
 </form>
