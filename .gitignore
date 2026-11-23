@@ -28,3 +28,7 @@ Thumbs.db
 *.log
 logs/
 **/backend/uploads/*
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
